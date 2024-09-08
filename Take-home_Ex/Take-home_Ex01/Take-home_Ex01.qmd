@@ -1,0 +1,11 @@
+---
+title: "Take-home Exercise 1"
+author: "Brigitta Karen Tsai"
+date: "September 7, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
