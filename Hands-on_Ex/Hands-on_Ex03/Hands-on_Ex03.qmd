@@ -52,7 +52,7 @@ plot(childcare,add=T,col='red',pch = 19)
 **Visualise with high cartographic quality and interactive manner**
 
 ```{r}
-tmap_mode('view')
+tmap_mode('plot')
 tm_shape(childcare) + 
   tm_dots() + 
   tm_shape(network) +
@@ -137,7 +137,7 @@ lixels$density <- lixels$density*1000
 ```
 
 ```{r}
-tmap_mode('view')
+tmap_mode('plot')
 tm_shape(lixels)+
   tm_lines(col="density")+
 tm_shape(childcare)+
