@@ -1,0 +1,15 @@
+{
+  "hash": "77649125bba060b8a638f64fb026b25c",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"In-class Exercise 2\"\nauthor: \"Brigitta Karen Tsai\"\ndate: \"September 2, 2024\"\ndate-modified: \"last-modified\"\nexecute: \n  eval: true\n  echo: true\n  message: false\n  freeze: true\n---\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(sf, tidyverse, tmap)\n```\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nsg_sf <- st_read(dsn = \"data\", layer=\"CostalOutline\")\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\nReading layer `CostalOutline' from data source \n  `C:\\brigittatsai\\ISSS626_AY2024-25_T1\\In-class_Ex\\In-class_Ex02\\data' \n  using driver `ESRI Shapefile'\nSimple feature collection with 60 features and 4 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 2663.926 ymin: 16357.98 xmax: 56047.79 ymax: 50244.03\nProjected CRS: SVY21\n```\n\n\n:::\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nmpsz_sf <- st_read(dsn = \"data\", \n                layer = \"MP14_SUBZONE_WEB_PL\")\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\nReading layer `MP14_SUBZONE_WEB_PL' from data source \n  `C:\\brigittatsai\\ISSS626_AY2024-25_T1\\In-class_Ex\\In-class_Ex02\\data' \n  using driver `ESRI Shapefile'\nSimple feature collection with 323 features and 15 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33\nProjected CRS: SVY21\n```\n\n\n:::\n:::\n\n\n### **Issue 1: Installing maptools**\n\nmaptools is retired, but we can still download from CRAN archive.\n\n\n::: {.cell}\n\n```{.r .cell-code}\ninstall.packages(\"maptools\",\n                 repos = \"https://packagemanager.posit.co/cran/2023-10-13\")\n```\n:::\n\n\n### Issue 2: Creating coastal outline\n\nst_combine() returns a single, combined geometry with no resolved boundaries (returned geometries may be invalid)\n\nif y is missing, st_union(x) returns a single geometry with resolved boundaries\n\n\n::: {.cell}\n\n```{.r .cell-code}\nsg_sf <- mpsz_sf %>%\n  st_union()\n```\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

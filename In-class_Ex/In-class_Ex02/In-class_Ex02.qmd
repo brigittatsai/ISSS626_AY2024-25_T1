@@ -1,0 +1,45 @@
+---
+title: "In-class Exercise 2"
+author: "Brigitta Karen Tsai"
+date: "September 2, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+```{r}
+pacman::p_load(sf, tidyverse, tmap)
+```
+
+```{r}
+sg_sf <- st_read(dsn = "data", layer="CostalOutline")
+```
+
+```{r}
+mpsz_sf <- st_read(dsn = "data", 
+                layer = "MP14_SUBZONE_WEB_PL")
+```
+
+### **Issue 1: Installing maptools**
+
+maptools is retired, but we can still download from CRAN archive.
+
+```{r}
+#| eval: false
+install.packages("maptools",
+                 repos = "https://packagemanager.posit.co/cran/2023-10-13")
+```
+
+### Issue 2: Creating coastal outline
+
+st_combine() returns a single, combined geometry with no resolved boundaries (returned geometries may be invalid)
+
+if y is missing, st_union(x) returns a single geometry with resolved boundaries
+
+```{r}
+sg_sf <- mpsz_sf %>%
+  st_union()
+```

@@ -1,0 +1,55 @@
+---
+title: "In-class Exercise 1"
+author: "Brigitta Karen Tsai"
+date: "August 26, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+### Load R Packages
+
+```{r}
+pacman::p_load(tidyverse, sf, tmap, ggstatsplot)
+```
+
+::: :::
+
+### Working with Master Plan Planning Sub-zone Data
+
+#Master Plan 2014 The code below imports shapefile
+
+```{r}
+mpsz14_shp <- st_read(dsn = "data/",
+                layer = "MP14_SUBZONE_WEB_PL")
+```
+
+to export to kml version (the original file is corrupted)
+
+```{r}
+#| output: FALSE
+st_write(mpsz14_shp,
+         "data/MP14_SUBZONE_WEB_PL.kml",
+         delete_dsn = TRUE)
+```
+
+-   shp file is tidier than the kml version\*
+
+# Master Plan 2019 Subzone Boundary (No Sea)
+
+Import the 2019 data shp file
+
+```{r}
+mpsz19_shp <- st_read(dsn = "data/",
+                layer = "MPSZ-2019") %>%
+  st_transform(crs = 3414) 
+```
+
+kml file
+
+```{r}
+mpsz19_kml <- st_read("data/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")
+```
