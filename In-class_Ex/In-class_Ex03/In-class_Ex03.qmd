@@ -1,0 +1,148 @@
+---
+title: "In-class Exercise 3"
+author: "Brigitta Karen Tsai"
+date: "September 09, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+## Load Packages
+
+```{r}
+pacman::p_load(sf, spNetwork, tmap, tidyverse)
+```
+
+## Import Datasets
+
+```{r}
+network <- st_read(dsn="data/geospatial", 
+                   layer="Punggol_St")
+```
+
+There is Z value in the dataset, drop Z dimension using st_zm() function
+
+```{r}
+childcare <- st_read(dsn="data/geospatial",
+                     layer="Punggol_CC") %>%
+  st_zm(drop = TRUE,
+        what = "ZM")
+```
+
+check the output, the Z value has disappeared. The output of the code above interprets the input of the data instead of the output shp file.
+
+## Visualising Geospatial Data
+
+Without st_geometry, the plot will be separated:
+
+```{r}
+plot(network)
+plot(childcare,add=T,col='red',pch = 19)
+```
+
+pch = point size
+
+add=T, open plot or override the dots to the previous plot
+
+```{r}
+plot(st_geometry(network))
+plot(childcare,add=T,col='red',pch = 19)
+```
+
+to put markers using tmap, there are at least 4 ways to do it
+
+tm_symbols(), tm_squares(), tm_bubbles(), tm_dots(), tm_markers()
+
+```{r}
+tmap_mode('view')
+tm_shape(childcare) + 
+  tm_dots(col = "red") + 
+  tm_shape(network) +
+  tm_lines()
+tmap_mode('plot')
+```
+
+leaflet = lightweight mapping package (eg. for mobile app)
+
+## Preparing Lixel Objects
+
+length of lixel = 700m -\> set to 700 based on study
+
+minimum length of a lixel = 350 -\> center point (minimum distance)
+
+```{r}
+lixels <- lixelize_lines(network, 
+                         700, 
+                         mindist = 350)
+```
+
+output: 2645 observation
+
+original (network): 2642 observation
+
+this happens because the last segment is longer than 350
+
+```{r}
+lixels <- lixelize_lines(network, 
+                         700, 
+                         mindist = 150)
+```
+
+if we change minimum distance to 150, the no. of segment will change
+
+```{r}
+samples <- lines_center(lixels)
+```
+
+```{r}
+tmap_mode('view')
+tm_shape(lixels) +
+  tm_lines() +
+tm_shape(samples) +
+  tm_dots(size = 0.01)
+tmap_mode('plot')
+```
+
+## Performing NKDE
+
+```{r}
+densities <- nkde(network, 
+                   events = childcare,
+                   w = rep(1, nrow(childcare)),
+                   samples = samples, # input data
+                  kernel_name = "quartic",
+                  bw = 300,
+                  div = "bw",
+                  method = "simple",
+                  digits = 1,
+                  tol = 1,
+                  grid_shape = c(1,1),
+                  max_depth = 8,
+                  agg = 5,
+                  sparse = TRUE,
+                  verbose = FALSE)
+```
+
+The code chunk below is a way to append the value to sample/ lixel dataframe (concept: left join table, but there is no need for unique identifier):
+
+```{r}
+samples$density <- densities
+lixels$density <- densities
+```
+
+**don't do sorting (it will change the sequence and the point reference will be inaccurate)**
+
+kfunction = accumulative distance
+
+gfunction = ring by ring
+
+The code chunk below results in both kplot and gplot
+
+*kfun_childcare \<- kfunctions(network, childcare, start = 0, end = 1000, step = 50, width = 50, nsim = 50, resolution = 50, verbose = FALSE, conf_int = 0.05)*
+
+To plot only the kfunction, use the following code (change to plotg to plot gfunction):
+
+*kfun_childcare\$plotk*

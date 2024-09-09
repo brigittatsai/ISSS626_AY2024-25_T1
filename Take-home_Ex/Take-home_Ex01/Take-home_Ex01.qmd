@@ -9,3 +9,25 @@ execute:
   message: false
   freeze: true
 ---
+
+```{r}
+pacman::p_load(sf, tmap, tidyverse, spNetwork)
+```
+
+### Importing Datasets
+
+\* Use the code below (clean the missing values first)
+
+```{r}
+acc <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %>%
+  mutate(Month = month(incident_datetime)) %>%
+  mutate(Month_fac = month(incident_datetime, label = TRUE,
+                           abbr = TRUE)) %>%
+  mutate(dayofweek = day(incident_datetime))
+```
+
+## Export Derived Data to RDS folder
+
+write_rds(acc, "data/rds/acc.rds")
+
+acc \<- read_rds("data/rds/acc.rds")
