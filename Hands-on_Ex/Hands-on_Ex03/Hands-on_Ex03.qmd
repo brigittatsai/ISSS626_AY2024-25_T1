@@ -10,6 +10,8 @@ execute:
   freeze: true
 ---
 
+# Network Constrained Spatial Point Patterns Analysis
+
 ### Load and Install R Packages
 
 ```{r}
