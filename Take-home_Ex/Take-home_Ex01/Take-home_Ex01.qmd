@@ -10,6 +10,32 @@ execute:
   freeze: true
 ---
 
+# Take-home Exercise 1: Geospatial Analytics for Public Good
+
+## Objectives
+
+The purpose of this study is to discover the factors affecting road traffic accidents in **Bangkok Metropolitan Region (BMR)** by employing **both spatial spatio-temporal point patterns analysis methods.**
+
+List of objectives:
+
+1.  To visualize the spatio-temporal dynamics of road traffic accidents in **BMR** using appropriate **statistical graphics and geovisualization** methods
+2.  To conduct detailed spatial analysis of road traffic accidents using appropriate **Network Spatial Point Patterns Analysis** methods.
+3.  To conduct detailed spatio-temporal analysis of road traffic accidents using appropriate **Temporal Network Spatial Point Patterns Analysis** methods.
+
+Road Traffic Accident major factors:
+
+1.  Behavioural Factors
+    -   Driver Behaviour (driving style)
+
+    -   Driver Performance (driving skills)
+2.  Environmental Factors
+
+## The Data
+
+## Get Started
+
+### Load R Packages
+
 ```{r}
 pacman::p_load(sf, tmap, tidyverse, spNetwork)
 ```
@@ -18,15 +44,117 @@ pacman::p_load(sf, tmap, tidyverse, spNetwork)
 
 \* Use the code below (clean the missing values first)
 
+#### Import csv file into R
+
+The csv data includes Thailand Road Accident dataset from the year 2019-2022
+
 ```{r}
-acc <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %>%
+road_accident_raw <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %>%
   mutate(Month = month(incident_datetime)) %>%
   mutate(Month_fac = month(incident_datetime, label = TRUE,
                            abbr = TRUE)) %>%
   mutate(dayofweek = day(incident_datetime))
 ```
 
-## Export Derived Data to RDS folder
+```{r}
+road_accident_raw
+```
+
+#### Import shape file into R
+
+The first shapefile dataset contains Thailand Roads Lines data
+
+```{r}
+thai_road_raw <- st_read(dsn = "data/rawdata", 
+                 layer = "hotosm_tha_roads_lines_shp")
+```
+
+```{r}
+thai_road_raw
+```
+
+The second shapefile dataset contains Thailand subnational administrative boundaries data
+
+```{r}
+thai_boundaries_raw <- st_read(dsn = "data/rawdata", 
+                 layer = "tha_admbndp_admALL_rtsd_itos_20220121")
+```
+
+```{r}
+thai_boundaries_raw
+```
+
+## Geospatial Data Wrangling
+
+#### Handling Missing Values
+
+Let us check if there are any missing values in the datasets
+
+1.  Thailand Road Accident Dataset
+
+```{r}
+road_accident_raw[is.na(road_accident_raw$latitude), ]
+```
+
+```{r}
+road_accident_raw[is.na(road_accident_raw$longitude), ]
+```
+
+Let's remove the rows with missing values and derive a new cleaned dataset
+
+Remove all the records with missing value in both *latitude* and *longitude* columns using the *latitude* column
+
+```{r}
+road_accident <- road_accident_raw[!is.na(road_accident_raw$latitude),]
+```
+
+Let us check if there is still existing missing value using the *longitude* column
+
+```{r}
+road_accident[is.na(road_accident$longitude), ]
+```
+
+2.  Thailand Road Dataset
+
+#### Retrieve Referencing System
+
+```{r}
+st_crs(tr_shp)
+```
+
+```{r}
+tr_shp <- st_transform(tr_shp, 32647)
+```
+
+```{r}
+st_crs(sab_shp)
+```
+
+```{r}
+sab_shp <- st_transform(sab_shp, 32647)
+```
+
+```{r}
+tmap_mode("plot")
+tm_shape(tr_shp) +
+  tm_polygons() +
+  tm_shape(sab_shp) +
+  tm_dots()
+```
+
+```{r}
+tmap_mode('view')
+tm_shape(thai_boundaries_raw)+
+  tm_dots()
+```
+
+```{r}
+tmap_mode('view')
+tm_shape(thai_road_raw)+
+  tm_dots()
+```
+
+### Export Derived Data to RDS folder
 
 write_rds(acc, "data/rds/acc.rds")
 
