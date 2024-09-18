@@ -35,7 +35,7 @@ hunan <- st_read(dsn = "data/geospatial",
 hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
 ```
 
-#### 2.3 Perform Relational Join Table 
+#### 2.3 Perform Relational Join Table
 
 ```{r}
 hunan <- left_join(hunan,hunan2012)%>%
@@ -55,7 +55,7 @@ gdppc <- qtm(hunan, "GDPPC")
 tmap_arrange(basemap, gdppc, asp=1, ncol=2)
 ```
 
-### 4. Compute Contiguity Spatial Weights 
+### 4. Compute Contiguity Spatial Weights
 
 #### 4.1 Compute QUEEN contiguity based neighbours
 
@@ -107,7 +107,7 @@ wm_r <- poly2nb(hunan, queen=FALSE)
 summary(wm_r)
 ```
 
-#### 4.3 Visualising Contiguity Weights 
+#### 4.3 Visualising Contiguity Weights
 
 ```{r}
 longitude <- map_dbl(hunan$geometry, ~st_centroid(.x)[[1]])
@@ -225,7 +225,7 @@ knn6
 str(knn6)
 ```
 
-##### 5.3.1 Plotting distance based neighbours 
+##### 5.3.1 Plotting distance based neighbours
 
 Plot weight matrix using the code below
 
