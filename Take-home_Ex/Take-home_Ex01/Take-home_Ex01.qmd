@@ -404,6 +404,7 @@ tmap_mode("view")
 ```
 
 ```{r}
+#| eval: false
 tm_shape(accidents) +
   tm_dots(alpha=0.5,
           size=0.05)
