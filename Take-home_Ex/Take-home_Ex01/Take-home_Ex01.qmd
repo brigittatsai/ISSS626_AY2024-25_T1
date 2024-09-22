@@ -12,7 +12,13 @@ execute:
 
 # Take-home Exercise 1: Geospatial Analytics for Public Good
 
-## Objectives
+## 1 Overview
+
+According to the World Health Organization (WHO), Thailand ranks 9th out of 175 WHO registered countries for road traffic deaths. WHO estimated an average of 50 road traffic deaths. This study will explore on the causes of accidents in Bangkok Metropolitan Region, to reduce future risk of road traffic accidents in Thailand.
+
+## 2 Getting Started
+
+### 2.1 Objectives
 
 The purpose of this study is to discover the factors affecting road traffic accidents in **Bangkok Metropolitan Region (BMR)** by employing **both spatial spatio-temporal point patterns analysis methods.**
 
@@ -30,25 +36,28 @@ Road Traffic Accident major factors:
     -   Driver Performance (driving skills)
 2.  Environmental Factors
 
-## The Data
+### 2.2 The Data
 
-## Get Started
+#### 2.3.1 Aspatial Data
 
-### Load R Packages
+#### 2.3.2 Geospatial Data
+
+### 2.3 Loading R Packages
 
 ```{r}
-pacman::p_load(sf, tmap, tidyverse, spNetwork)
+pacman::p_load(sp, sf, raster, spatstat, tmap, tidyverse, spNetwork, tmaptools)
 ```
 
-### Importing Datasets
+## 3 Data Preparation and Wrangling
 
-\* Use the code below (clean the missing values first)
+### 3.1 Importing Datasets
 
-#### Import csv file into R
+#### 3.1.1 Import Aspatial Data into R Environment
 
 The csv data includes Thailand Road Accident dataset from the year 2019-2022
 
 ```{r}
+#| eval: false
 road_accident_raw <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %>%
   mutate(Month = month(incident_datetime)) %>%
   mutate(Month_fac = month(incident_datetime, label = TRUE,
@@ -56,47 +65,50 @@ road_accident_raw <- read_csv("data/rawdata/thai_road_accident_2019_2022.csv") %
   mutate(dayofweek = day(incident_datetime))
 ```
 
-```{r}
-road_accident_raw
-```
-
-#### Import shape file into R
+#### 3.1.2 Import Geospatial Data into R Environment
 
 The first shapefile dataset contains Thailand Roads Lines data
 
 ```{r}
+#| eval: false
 thai_road_raw <- st_read(dsn = "data/rawdata", 
                  layer = "hotosm_tha_roads_lines_shp")
-```
-
-```{r}
-thai_road_raw
 ```
 
 The second shapefile dataset contains Thailand subnational administrative boundaries data
 
 ```{r}
+#| eval: false
 thai_boundaries_raw <- st_read(dsn = "data/rawdata", 
                  layer = "tha_admbndp_admALL_rtsd_itos_20220121")
 ```
 
+### 3.2 Data Cleaning
+
+To ensure smooth analysis, let us clean the datasets
+
+#### 3.2.1 Road Accident Dataset (Aspatial)
+
+**i. Remove Missing Values**
+
 ```{r}
-thai_boundaries_raw
+#| eval: false
+road_accident_raw <- st_as_sf(road_accident_raw, coords = c("longitude", "latitude"), crs = 4326)
+
+stop("This is an error code")
 ```
 
-## Geospatial Data Wrangling
+missing values in the longitude and latitude column is not allowed, let's remove it
 
-#### Handling Missing Values
-
-Let us check if there are any missing values in the datasets
-
-1.  Thailand Road Accident Dataset
+Let us check the missing values in both latitude and longitude column
 
 ```{r}
+#| eval: false
 road_accident_raw[is.na(road_accident_raw$latitude), ]
 ```
 
 ```{r}
+#| eval: false
 road_accident_raw[is.na(road_accident_raw$longitude), ]
 ```
 
@@ -105,57 +117,465 @@ Let's remove the rows with missing values and derive a new cleaned dataset
 Remove all the records with missing value in both *latitude* and *longitude* columns using the *latitude* column
 
 ```{r}
+#| eval: false
 road_accident <- road_accident_raw[!is.na(road_accident_raw$latitude),]
 ```
 
 Let us check if there is still existing missing value using the *longitude* column
 
 ```{r}
+#| eval: false
 road_accident[is.na(road_accident$longitude), ]
 ```
 
-2.  Thailand Road Dataset
-
-#### Retrieve Referencing System
+**ii. Remove Unnecessary Columns**
 
 ```{r}
-st_crs(tr_shp)
+#| eval: false
+road_accident$incident_time <- format(road_accident$incident_datetime, "%H:%M:%S")
 ```
 
 ```{r}
-tr_shp <- st_transform(tr_shp, 32647)
+#| eval: false
+road_accident$incident_date <- as.Date(road_accident$incident_datetime)
 ```
 
 ```{r}
-st_crs(sab_shp)
+#| eval: false
+road_accident <- road_accident[, !(names(road_accident) %in% c("province_th", "route", "report_datetime", "incident_datetime"))]
+```
+
+**iii. Filter Values**
+
+We are analyzing **Bangkok Metropolitan Region**, which consists of **Bangkok, Nonthaburi, Nakhon Pathom, Pathum Thani, Samut Prakan** and **Samut Sakhon.** Let's filter the values in **province_en** column
+
+```{r}
+#| eval: false
+road_accident <- road_accident %>% 
+  filter(road_accident$province_en %in% c("Bangkok", "Nonthaburi", "Nakhon Pathom", "Pathum Thani", "Samut Prakan", "Samut Sakhon")) 
+```
+
+**iv. Set CRS Reference System**
+
+```{r}
+#| eval: false
+road_accident <- st_as_sf(road_accident, coords = c("longitude", "latitude"), crs = 4326)
 ```
 
 ```{r}
-sab_shp <- st_transform(sab_shp, 32647)
+#| eval: false
+road_accident <- road_accident %>% 
+  st_transform(crs = 32647)
+```
+
+**v. Save Cleaned Dataset**
+
+Let's save the dataset to the new derived folder **rds**
+
+```{r}
+#| eval: false
+write_rds(road_accident, "data/rds/aspatial/road_accident.rds")
+```
+
+#### 3.2.2 Thailand Boundaries Dataset (Geospatial)
+
+**i. Remove Unnecessary Column**
+
+Let us check whether the column includes any value
+
+```{r}
+#| eval: false
+unique(thai_boundaries_raw$ADM3_REF)
+unique(thai_boundaries_raw$ADM3ALT1EN)
+unique(thai_boundaries_raw$ADM3ALT2EN)
+unique(thai_boundaries_raw$ADM3ALT1TH)
+unique(thai_boundaries_raw$ADM3ALT2TH)
+```
+
+All the columns consist of missing values
+
+Let us check other columns using the code below
+
+```{r}
+#| eval: false
+unique(thai_boundaries_raw$ADM0_EN)
+```
+
+This column is unnecessary as it has only 1 value, which shows that this only consist of Thailand data
+
+Let us remove all the columns listed below
+
+```{r}
+#| eval: false
+thai_boundaries <- thai_boundaries_raw[, !(names(thai_boundaries_raw) %in% c("ADM3_REF", "ADM3ALT1EN", "ADM3ALT2EN", "ADM3ALT1TH", "ADM3ALT2TH", "ADM3_TH","ADM2_TH", "ADM1_TH", "ADM0_TH", "ADM0_EN", "ADM0_PCODE", "ADM3_EN", "ADM3_PCODE", "ADM2_EN", "ADM2_PCODE", "validOn", "validTo"))]
+```
+
+**ii. Filter Values**
+
+The columns **ADM1** consist of provinces, let's check using the code chunk below
+
+```{r}
+#| eval: false
+unique(thai_boundaries$ADM1_EN)
+```
+
+Let us do filtering and remove records that are not in **Bangkok Metropolitan Region**
+
+```{r}
+#| eval: false
+thai_boundaries <- thai_boundaries %>%
+  filter(thai_boundaries$ADM1_EN %in% c("Bangkok", "Nonthaburi", "Nakhon Pathom", "Pathum Thani", "Samut Prakan", "Samut Sakhon")) 
+```
+
+**iii. Transform EPSG Code**
+
+```{r}
+#| eval: false
+thai_boundaries <- thai_boundaries %>% 
+  st_transform(crs = 32647)
+```
+
+**iv. Save Dataset**
+
+```{r}
+#| eval: false
+write_rds(thai_boundaries, "data/rds/geospatial/thai_boundaries.rds")
+```
+
+#### 3.2.3 Thailand Road Dataset (Geospatial)
+
+**i. Handling Missing Values**
+
+There are some missing values in the **road name** column, let's remove them with the code below
+
+```{r}
+#| eval: false
+thai_road <- thai_road_raw[!is.na(thai_road_raw$name_en),]
+```
+
+**ii. Remove Unnecessary Columns**
+
+Let us remove the columns that are not used for this analysis
+
+```{r}
+#| eval: false
+thai_road <- thai_road[, !(names(thai_road) %in% c("name", "name_th", "osm_id", "source"))]
+```
+
+**iii. Filter Values**
+
+Let's filter the values under the **highway** column in the dataset. Urban and local road that are not wide enough for motor cars will be removed. The highway type is filtered according to this [link](https://wiki.openstreetmap.org/wiki/WikiProject_Thailand#Highway_classification)
+
+```{r}
+#| eval: false
+unique(thai_road$highway)
 ```
 
 ```{r}
-tmap_mode("plot")
-tm_shape(tr_shp) +
-  tm_polygons() +
-  tm_shape(sab_shp) +
-  tm_dots()
+#| eval: false
+thai_road <- thai_road %>%
+  filter(thai_road$highway %in% c("motorway", "motorway_link", "primary", "primary_link","secondary","secondary_link","tertiary", "tertiary_link")) 
+```
+
+**iv. Set CRS Referencing System**
+
+```{r}
+#| eval: false
+thai_road <- st_set_crs(thai_road, 4326)
 ```
 
 ```{r}
-tmap_mode('view')
-tm_shape(thai_boundaries_raw)+
-  tm_dots()
+#| eval: false
+thai_road <- thai_road %>% 
+  st_transform(crs = 32647)
 ```
 
 ```{r}
-tmap_mode('view')
-tm_shape(thai_road_raw)+
-  tm_dots()
+#| eval: false
+thai_road <- st_cast(thai_road, "LINESTRING")
 ```
 
-### Export Derived Data to RDS folder
+**v. Save Dataset**
 
-write_rds(acc, "data/rds/acc.rds")
+```{r}
+#| eval: false
+write_rds(thai_road, "data/rds/geospatial/thai_road.rds")
+```
 
-acc \<- read_rds("data/rds/acc.rds")
+### 3.3 Perform Intersection
+
+The **thai_road** data includes all roads in Thailand. Our area of focus in this analysis is only in **Bangkok Metropolitan Region (BMR)**. Let's perform *st_intersection()* to filter out the roads data into only BMR area. Before we perform *st_intersection()*, let's read the cleaned file of **thai_road** data
+
+```{r}
+thai_road_rds <- read_rds("data/rds/geospatial/thai_road.rds")
+```
+
+Create a convex polygon around the points in boundaries data
+
+```{r}
+#| eval: false
+bmr_polygon <- st_convex_hull(st_union(bmr_boundary))
+```
+
+```{r}
+#| eval: false
+bmr_polygon_sf <- st_sf(geometry = bmr_polygon)
+```
+
+Perform the intersection of data points
+
+```{r}
+#| eval: false
+bmr_road <- st_intersection(thai_road_rds, bmr_polygon)
+```
+
+Save the new **Bangkok Metropolitan Region** roads to rds file
+
+```{r}
+#| eval: false
+write_rds(bmr_road, "data/rds/geospatial/bmr_road.rds")
+```
+
+### 3.4 Cleaned Dataset
+
+After the steps above, the datasets are all cleaned and filtered to **Bangkok Metropolitan Region** area. Now the dataset is ready for use
+
+```{r}
+bmr_accident <- read_rds("data/rds/aspatial/road_accident.rds")
+```
+
+```{r}
+bmr_boundary <- read_rds("data/rds/geospatial/thai_boundaries.rds")
+```
+
+```{r}
+bmr_road <- read_rds("data/rds/geospatial/bmr_road.rds")
+```
+
+## 4 Geovisualization and Analysis
+
+As stated on the **Objectives**, let us conduct the analysis using the cleaned dataset
+
+### 4.1 **Visualize Spatio-temporal Dynamics of Road Accidents**
+
+Using appropriate statistical graphics and geovisualization methods, visualize the spatio-temporal dynamics of road accident in **Bangkok Metropolitan Region** area.
+
+#### 4.1.1 Convert sf to Spatial class
+
+```{r}
+accidents <- as_Spatial(bmr_accident)
+roads <- as_Spatial(bmr_road)
+boundaries <- as_Spatial(bmr_boundary) 
+```
+
+#### 4.1.2 Create an owin object class from polygon sf
+
+```{r}
+#| eval: false
+bmr_boundary_owin <- as.owin(bmr_polygon_sf)
+```
+
+```{r}
+#| eval: false
+summary(bmr_boundary_owin)
+```
+
+#### 4.1.3 Convert to spatstat's ppp format
+
+```{r}
+bmr_accident_ppp <- as.ppp(bmr_accident)
+```
+
+```{r}
+any(duplicated(bmr_accident_ppp))
+```
+
+```{r}
+plot(bmr_accident_ppp)
+```
+
+From the plot above, we can see that the thicker dots are where accidents occur more frequently.
+
+#### 4.1.4 Accident Points Visualization
+
+```{r}
+#| eval: false
+tmap_mode("view")
+```
+
+```{r}
+tm_shape(accidents) +
+  tm_dots(alpha=0.5,
+          size=0.05)
+```
+
+![](images/clipboard-11498863.png)
+
+### 4.2 Cause of Accident Analysis
+
+As seen from the accident points visualization, there are a lot of accident points. Let's dive into the causes of the accidents. Before
+
+```{r}
+unique(bmr_accident$presumed_cause)
+```
+
+Categorize the **presumed_cause** into 3 categories. **Environmental Factor, Driver Behaviour** and **Driver Performance**
+
+```{r}
+bmr_accident <- bmr_accident %>%
+  mutate(factor = case_when(
+    presumed_cause %in% c("insufficient light", "disabled vehicle without proper signals", "no traffic signs", "no road divider lines", "dangerous curve", "worn-out/tire blowout", "vehicle electrical system failure", "slippery road", "repair/construction on the road", "inadequate visibility", "vehicle equipment failure", "debris/obstruction on the road", "disabled vehicle without proper signals/signs", "straddling lanes", "road in poor condition", "obstruction in sight", "brake/anti-lock brake system failure", "no presumed cause related to driver") ~ "Environmental",
+    presumed_cause %in% c("speeding", "driving under the influence of alcohol", "falling asleep", "sudden stop", "overloaded vehicle", "using mobile phone while driving", "running red lights/traffic signals","cutting in closely by people/vehicles/animals", "illegal overtaking", "abrupt lane change", "ignoring stop sign while leaving intersection", "tailgating", "using psychoactive substances") ~ "Driver Behaviour",
+    presumed_cause %in% c("failure to yield/signal", "driving in the wrong lane", "unfamiliarity with the route/unskilled driving", "loss of control", "failure to signal enter/exit parking", "reversing vehicle", "failure to yield right of way", "medical condition") ~ "Driver Performance",
+    TRUE ~ "Other"  # Optional: to handle any cases that don't fit
+  ))
+
+```
+
+Split sf dataframe into 3 according to the factor of accident
+
+```{r}
+ef_accident <- bmr_accident %>% 
+  filter(factor == "Environmental")
+db_accident <- bmr_accident %>% 
+  filter(factor == "Driver Behaviour")
+dp_accident <- bmr_accident %>% 
+  filter(factor == "Driver Performance")
+```
+
+Convert to ppp object
+
+```{r}
+ef_accident_ppp <- as.ppp(ef_accident)
+db_accident_ppp <- as.ppp(db_accident)
+dp_accident_ppp <- as.ppp(dp_accident)
+```
+
+```{r}
+accidents_factor <- bmr_accident %>%
+  group_by(factor) %>%
+  summarise(Accident_Count = n(), .groups = 'drop') 
+```
+
+```{r}
+summary(accidents_factor$Accident_Count)
+```
+
+```{r}
+par(mar = c(8, 4, 4, 2))
+barplot(accidents_factor$Accident_Count,
+        names.arg = accidents_factor$factor,
+        ylab = "No. of Accidents",
+        las = 2)
+```
+
+#### 4.2.1 Environmental Factor
+
+## Tabset {.tabset}
+
+### Environmental Factor
+
+Let's plot the accident points caused by environmental factor
+
+```{r}
+tmap_mode("view")
+tm_shape(bmr_accident %>% filter(factor == "Environmental")) +
+  tm_dots(alpha=0.5,
+          size=0.05)
+```
+
+#### 4.2.2 Behavioural Factor - Driver Behaviour
+
+```{r}
+tmap_mode("view")
+tm_shape(bmr_accident %>% filter(factor == "Driver Behaviour")) +
+  tm_dots(alpha=0.5,
+          size=0.05)
+```
+
+### 4.3 Road Accidents by Province
+
+```{r}
+accidents_province <- bmr_accident %>%
+  group_by(province_en) %>%
+  summarise(Accident_Count = n(), .groups = 'drop') 
+```
+
+```{r}
+summary(accidents_province$Accident_Count)
+```
+
+```{r}
+par(mar = c(8, 4, 4, 2))
+barplot(accidents_province$Accident_Count,
+        names.arg = accidents_province$province_en,
+        ylab = "No. of Accidents",
+        las = 2)
+```
+
+### 4.4 Kernel Density Estimation
+
+```{r}
+bkk <- bmr_accident %>% 
+  filter(province_en == "Bangkok")
+nb <- bmr_accident %>% 
+  filter(province_en == "Nonthaburi")
+np <- bmr_accident %>% 
+  filter(province_en == "Nakhon Pathom")
+pt <- bmr_accident %>% 
+  filter(province_en == "Pathum Thani")
+sp <- bmr_accident %>% 
+  filter(province_en == "Samut Prakan")
+ss <- bmr_accident %>% 
+  filter(province_en == "Samut Sakhon")
+```
+
+```{r}
+par(mfrow=c(2,2))
+plot(bkk, main = "Bangkok")
+```
+
+### 4.4 Network Spatial Point Pattern Analysis (NKDE)
+
+Using the appropriate network spatial point pattern analysis methods, conduct a detailed spatial analysis of the road accidents.
+
+#### 4.4.1 Preparing Lixels Object
+
+The boundaries data is in geometry points, convert to linestring first
+
+```{r}
+bmr_lineboundary <- st_cast(bmr_boundary, "LINESTRING")
+```
+
+Prepare Lixels and sample
+
+```{r}
+lixels <- lixelize_lines(bmr_lineboundary,200,mindist = 50)
+samples <- lines_center(lixels)
+```
+
+```{r}
+bmr_lineboundary <- bmr_lineboundary[!st_is_valid(bmr_lineboundary),]
+```
+
+```{r}
+dim(bmr_lineboundary)
+dim(bmr_accident)
+dim(samples)
+```
+
+#### 4.2.3 Network Kernel Density Estimation
+
+```{r}
+#| eval: false
+data(bmr_road) 
+data(ef_accident)
+
+
+tm_shape(bmr_road) + 
+  tm_lines("grey") + 
+  tm_shape(ef_accident) + 
+  tm_dots("red", size = 0.05)
+```
+
+![](images/clipboard-1804947654.png){width="675"}
