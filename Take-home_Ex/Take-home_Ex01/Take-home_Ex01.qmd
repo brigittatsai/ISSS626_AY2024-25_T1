@@ -40,7 +40,15 @@ Road Traffic Accident major factors:
 
 #### 2.3.1 Aspatial Data
 
+The aspatial data for this study is [**Thailand Road Accident**](https://www.kaggle.com/datasets/thaweewatboy/thailand-road-accident-2019-2022) from year 2019 to 2022 from Kaggle
+
 #### 2.3.2 Geospatial Data
+
+The geospatial data for this study are:
+
+-   [**Thailand Roads**](https://data.humdata.org/dataset/hotosm_tha_roads) from HDX
+
+-   [**Thailand Subnational Administrative Boundaries**](https://data.humdata.org/dataset/cod-ab-tha?) from HDX
 
 ### 2.3 Loading R Packages
 
@@ -399,15 +407,14 @@ From the plot above, we can see that the thicker dots are where accidents occur 
 #### 4.1.4 Accident Points Visualization
 
 ```{r}
-#| eval: false
-tmap_mode("view")
+tmap_mode("plot")
 ```
 
 ```{r}
-#| eval: false
 tm_shape(accidents) +
   tm_dots(alpha=0.5,
-          size=0.05)
+          size=0.05) +
+  tm_basemap(server = "OpenStreetMap")
 ```
 
 ![](images/clipboard-11498863.png)
@@ -470,17 +477,17 @@ barplot(accidents_factor$Accident_Count,
         las = 2)
 ```
 
+From the bar chart plotted above, it can be seen that in Bangkok Metropolitan Region, majority of the accidents are caused due to **driver behaviour.**
+
 #### 4.2.1 Environmental Factor
-
-## Tabset {.tabset}
-
-### Environmental Factor
 
 Let's plot the accident points caused by environmental factor
 
 ```{r}
-tmap_mode("view")
-tm_shape(bmr_accident %>% filter(factor == "Environmental")) +
+tmap_mode("plot")
+tm_shape(bmr_road) +
+  tm_lines(col="grey") +
+  tm_shape(bmr_accident %>% filter(factor == "Environmental")) +
   tm_dots(alpha=0.5,
           size=0.05)
 ```
@@ -488,8 +495,23 @@ tm_shape(bmr_accident %>% filter(factor == "Environmental")) +
 #### 4.2.2 Behavioural Factor - Driver Behaviour
 
 ```{r}
-tmap_mode("view")
-tm_shape(bmr_accident %>% filter(factor == "Driver Behaviour")) +
+tmap_mode("plot")
+tm_shape(bmr_road) +
+  tm_lines(col="grey") +
+  tm_shape(bmr_accident %>% filter(factor == "Driver Behaviour")) +
+  tm_dots(alpha=0.5,
+          size=0.05)
+```
+
+In accidents caused by **driver behaviour**, we can see the roads that have more concentrated dots are the road lines that most accidents occur due to driver behaviour.
+
+#### 4.2.3 Behavioural Factor - Driver Performance
+
+```{r}
+tmap_mode("plot")
+tm_shape(bmr_road) +
+  tm_lines(col="grey") +
+  tm_shape(bmr_accident %>% filter(factor == "Driver Performance")) +
   tm_dots(alpha=0.5,
           size=0.05)
 ```
@@ -514,7 +536,7 @@ barplot(accidents_province$Accident_Count,
         las = 2)
 ```
 
-### 4.4 Kernel Density Estimation
+From the bar chart above, we can see that the majority of accidents happen in Bangkok area. Let's plot it.
 
 ```{r}
 bkk <- bmr_accident %>% 
@@ -535,6 +557,51 @@ ss <- bmr_accident %>%
 par(mfrow=c(2,2))
 plot(bkk, main = "Bangkok")
 ```
+
+### 4.4 Bangkok Accidents Analysis
+
+From the analysis result above, we can see that Bangkok has the most accident and most of the accidents happen due to driver behaviour. Let us dive deep into Bangkok area for further analysis
+
+Filter out Bangkok and factor using the code chunk below
+
+```{r}
+bkk_accidents <- bmr_accident %>% 
+  filter(province_en == "Bangkok" & factor == "Driver Behaviour")
+```
+
+Let us plot the map below
+
+```{r}
+tmap_mode("plot")
+tm_shape(bkk_accidents) +
+  tm_dots()
+```
+
+![](images/clipboard-988547338.png)
+
+If we see from the map above, we can see that most of the accidents are concentrated on the 4-way intersection on the right side of the map. These accidents happen due to driver behaviours.
+
+Let us check the type of highway with most accidents using the code below
+
+```{r}
+bkk_highway <- st_join(bmr_road, bkk_accidents)
+```
+
+```{r}
+accidents_highway <- bkk_highway %>%
+  group_by(bkk_highway$highway) %>%
+  summarise(Highway_Count = n(), .groups = 'drop')
+```
+
+```{r}
+par(mar = c(8, 4, 4, 2))
+barplot(accidents_highway$Highway_Count,
+        names.arg = accidents_highway$highway,
+        ylab = "No. of Accidents",
+        las = 2)
+```
+
+The barplot shows that most accidents happen in **primary, secondary and tertiary** highways.
 
 ### 4.4 Network Spatial Point Pattern Analysis (NKDE)
 
@@ -565,10 +632,9 @@ dim(bmr_accident)
 dim(samples)
 ```
 
-#### 4.2.3 Network Kernel Density Estimation
+#### 4.4.2 Network Kernel Density Estimation
 
 ```{r}
-#| eval: false
 data(bmr_road) 
 data(ef_accident)
 
@@ -580,3 +646,11 @@ tm_shape(bmr_road) +
 ```
 
 ![](images/clipboard-1804947654.png){width="675"}
+
+## 5 Conclusion
+
+From this study, we can conclude that most accidents are caused by driver behaviour and the following picture is the 4 way intersection with the most accident data points.
+
+![](images/clipboard-417656923.png)
+
+Most of the accidents happened in the primary, secondary and tertiary highways. The driver behaviour is something that we need to focus on for future studies, to prevent future accidents from happening. For future safety of road traffic, the Bangkok Metropolitan should pay more attention on primary, secondary and tertiary highways by implementing more strict rules on driving in the road. As we can see from the plotted maps, along the intercity road from Pathum Thani to Samut Prakan are filled with a lot of road accident points.

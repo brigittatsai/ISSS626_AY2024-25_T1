@@ -39,6 +39,7 @@ check the output, the Z value has disappeared. The output of the code above inte
 Without st_geometry, the plot will be separated:
 
 ```{r}
+#| eval: false
 plot(network)
 plot(childcare,add=T,col='red',pch = 19)
 ```
@@ -48,6 +49,7 @@ pch = point size
 add=T, open plot or override the dots to the previous plot
 
 ```{r}
+#| eval: false
 plot(st_geometry(network))
 plot(childcare,add=T,col='red',pch = 19)
 ```
@@ -55,15 +57,6 @@ plot(childcare,add=T,col='red',pch = 19)
 to put markers using tmap, there are at least 4 ways to do it
 
 tm_symbols(), tm_squares(), tm_bubbles(), tm_dots(), tm_markers()
-
-```{r}
-tmap_mode('view')
-tm_shape(childcare) + 
-  tm_dots(col = "red") + 
-  tm_shape(network) +
-  tm_lines()
-tmap_mode('plot')
-```
 
 leaflet = lightweight mapping package (eg. for mobile app)
 
@@ -98,7 +91,6 @@ samples <- lines_center(lixels)
 ```
 
 ```{r}
-tmap_mode('view')
 tm_shape(lixels) +
   tm_lines() +
 tm_shape(samples) +
@@ -109,6 +101,7 @@ tmap_mode('plot')
 ## Performing NKDE
 
 ```{r}
+#| eval: false
 densities <- nkde(network, 
                    events = childcare,
                    w = rep(1, nrow(childcare)),
@@ -129,6 +122,7 @@ densities <- nkde(network,
 The code chunk below is a way to append the value to sample/ lixel dataframe (concept: left join table, but there is no need for unique identifier):
 
 ```{r}
+#| eval: false
 samples$density <- densities
 lixels$density <- densities
 ```
