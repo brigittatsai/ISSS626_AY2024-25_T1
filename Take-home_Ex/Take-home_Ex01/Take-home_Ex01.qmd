@@ -615,7 +615,16 @@ The boundaries data is in geometry points, convert to linestring first
 bmr_lineboundary <- st_cast(bmr_boundary, "LINESTRING")
 ```
 
+```{r}
+bmr_lineboundary <- st_is_valid(bmr_lineboundary)
+```
+
 Prepare Lixels and sample
+
+```{r}
+bmr_lineboundary <- bmr_boundary %>%
+  mutate(geometry = st_cast(geometry, "LINESTRING"))
+```
 
 ```{r}
 lixels <- lixelize_lines(bmr_lineboundary,200,mindist = 50)
@@ -635,17 +644,31 @@ dim(samples)
 #### 4.4.2 Network Kernel Density Estimation
 
 ```{r}
-data(bmr_road) 
-data(ef_accident)
+#| eval: false
+bmr_lineboundary <- bmr_boundary %>%
+  mutate(geometry = st_cast(geometry, "LINESTRING"))
 
-
-tm_shape(bmr_road) + 
-  tm_lines("grey") + 
-  tm_shape(ef_accident) + 
-  tm_dots("red", size = 0.05)
+densities <- nkde(bmr_lineboundary,
+                  events = bmr_accident,
+                  w = rep(1, nrow(bmr_accident)),
+                  samples = samples, 
+                  kernel_name = "quartic",
+                  method = "simple",
+                  bw = 300,
+                  sparse = TRUE,
+                  verbose = FALSE)
 ```
 
-![](images/clipboard-1804947654.png){width="675"}
+```{r}
+data(bmr_boundary) 
+data(bmr_accident)
+tmap_mode("plot")
+
+tm_shape(bmr_boundary) + 
+  tm_dots("grey") + 
+  tm_shape(bmr_accident) + 
+  tm_dots("red", size = 0.05)
+```
 
 ## 5 Conclusion
 
