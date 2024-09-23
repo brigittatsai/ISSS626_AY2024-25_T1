@@ -1,0 +1,232 @@
+---
+title: "In-class Exercise 5"
+author: "Brigitta Karen Tsai"
+date: "September 23, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+# Global and Local Measures of Spatial Autocorrelation: sfdep methods
+
+## 1 Getting Started
+
+### 1.1 Install and Load R Packages
+
+```{r}
+pacman::p_load(sf, tmap, sfdep, tidyverse)
+```
+
+### 1.2 Import Dataset
+
+::: panel-tabset
+### Import Data
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+:::
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+```{r}
+hunan_GDPPC <- left_join(hunan,hunan2012) %>%
+  select(1:4, 7, 15)
+```
+
+### 1.3 Plotting a Choropleth Map
+
+```{r}
+tmap_mode("plot")
+tm_shape(hunan_GDPPC) +
+  tm_fill("GDPPC",
+          style = "quantile",
+          palette = "Blues",
+          title = "GDPPC") +
+  tm_borders(col = "grey") +
+  tm_layout(main.title = "Distribution of GDP per capita by country, Hunan Province",
+            main.title.position = "center",
+            main.title.size = 1.2,
+            legend.height = 0.45,
+            legend.width = 0.35,
+            frame = TRUE)
+```
+
+## 2 Global Measures of Spatial Associations
+
+### 2.1 Step 1: Deriving Queen's Contiguity Weight (sfdep method)
+
+```{r}
+wm_q <- hunan_GDPPC %>%
+  mutate(nb = st_contiguity(geometry),
+         wt = st_weights(nb,
+                         style = "W"),
+         .before = 1) # insert into 1st column 
+```
+
+### 2.2 Compute Global Moran's I
+
+The code below does not give the p-value and statistics result
+
+```{r}
+moranI <- global_moran(wm_q$GDPPC,
+                       wm_q$nb,
+                       wm_q$wt)
+glimpse(moranI)
+```
+
+### 2.3 Perform Global Moran's I Test
+
+In general, Moran's I test will be performed instead of just computing the Moran's I statistics.
+
+```{r}
+global_moran_test(wm_q$GDPPC,
+                  wm_q$nb,
+                  wm_q$wt)
+```
+
+Result of Moran I statistic: low positive spatial autocorrelation
+
+### 2.4 Perform Global Moran's I Permutation Test
+
+#### 2.4.1 Step 1: Set Seed
+
+To ensure it's reproducible
+
+```{r}
+set.seed(1234)
+```
+
+#### 2.4.2 Step 2: Monte Carlo Simulation
+
+```{r}
+global_moran_perm(wm_q$GDPPC,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 99)
+```
+
+R computation starts with 0, so use 99 to run 100 simulation
+
+Statistical Result: Weak positive spatial autocorrelation (0.30075)
+
+### 2.5 Local Moran's I
+
+#### 2.5.1 Computing Local Moran's I
+
+```{r}
+lisa <- wm_q %>% 
+  mutate(local_moran = local_moran(
+    GDPPC, nb, wt, nsim = 99),
+    .before = 1) %>% 
+  unnest(local_moran) # unnest is to combine with the original
+```
+
+```{r}
+lisa
+```
+
+ii = local moran I statistics
+
+mean = detect outlier using mean
+
+median = detect outlier using median
+
+#### 2.5.2 Visualising local Moran's I
+
+```{r}
+tmap_mode("plot")
+tm_shape(lisa) +
+  tm_fill("ii") +
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8)) + 
+  tm_layout(
+    main.title = "local Moran's I of GDPPC",
+    main.title.size = 1)
+```
+
+#### 2.5.3 Visualising p-value of local Moran's I
+
+```{r}
+tmap_mode("plot")
+tm_shape(lisa) +
+  tm_fill("p_ii") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of local Moran's I",
+            main.title.size = 1)
+```
+
+### 2.6 Local Gi\* statistics
+
+#### 2.6.1 Derive a Spatial Weight Matrix
+
+We need to derive a spatial weight matrix before we can compute local Gi\* satistics
+
+```{r}
+wm_idw <- hunan_GDPPC %>% 
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry, # use inverse distance weight to form the distance that we want 
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+```
+
+#### 2.6.2 Compute Local Gi\* Statistics 
+
+Now we compute the local Gi\*
+
+```{r}
+HCSA <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    GDPPC, nb, wt, nsim = 99),
+    .before = 1) %>% 
+  unnest(local_Gi)
+HCSA
+```
+
+#### 2.6.3 Visualising Gi\* 
+
+```{r}
+tmap_mode("plot")
+tm_shape(HCSA) +
+  tm_fill("gi_star") +
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8))
+```
+
+```{r}
+HCSA_sig <- HCSA %>% 
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+tm_shape(HCSA) + 
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(HCSA_sig) +
+  tm_fill("cluster") +
+  tm_borders(alpha = 0.4)
+```
+
+Yellow = hotspot, Green = coldspot
+
+```{r}
+tmap_mode("plot")
+map1 <- tm_shape(HCSA)+
+  tm_fill("gi_star")+
+  tm_borders(alpha=0.5)
+
+tmap_mode("plot")
+map2 <- tm_shape(HCSA)+
+  tm_polygons()+
+  tm_borders(alpha = 0.5)+
+tm_shape(HCSA_sig)+
+  tm_fill("cluster")+
+  tm_borders(alpha = 0.4)
+
+  tmap_arrange(map1, map2, ncol=2)
+```
