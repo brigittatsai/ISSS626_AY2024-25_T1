@@ -177,7 +177,7 @@ wm_idw <- hunan_GDPPC %>%
          .before = 1)
 ```
 
-#### 2.6.2 Compute Local Gi\* Statistics 
+#### 2.6.2 Compute Local Gi\* Statistics
 
 Now we compute the local Gi\*
 
@@ -190,7 +190,7 @@ HCSA <- wm_idw %>%
 HCSA
 ```
 
-#### 2.6.3 Visualising Gi\* 
+#### 2.6.3 Visualising Gi\*
 
 ```{r}
 tmap_mode("plot")
