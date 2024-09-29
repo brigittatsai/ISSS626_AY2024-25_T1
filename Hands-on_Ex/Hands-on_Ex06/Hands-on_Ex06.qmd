@@ -168,31 +168,31 @@ Before the new variable is derived, the histogram was right-skewed. It is becaus
 #### 2.2.1 Joining geospatial data and aspatial data
 
 ```{r}
-shan_join <- left_join(shan_sf, 
+shan_sf <- left_join(shan_sf, 
                      ict_derived, by=c("TS_PCODE"="TS_PCODE"))
   
-write_rds(shan_join, "data/rds/shan_join.rds")
+write_rds(shan_join, "data/rds/shan_sf.rds")
 ```
 
 ```{r}
-shan_join <- read_rds("data/rds/shan_join.rds")
+shan_sf <- read_rds("data/rds/shan_sf.rds")
 ```
 
 #### 2.2.2 Preparing a choropleth map
 
 ```{r}
-qtm(shan_join, "RADIO_PR")
+qtm(shan_sf, "RADIO_PR")
 ```
 
 ```{r}
-TT_HOUSEHOLDS.map <- tm_shape(shan_join) + 
+TT_HOUSEHOLDS.map <- tm_shape(shan_sf) + 
   tm_fill(col = "TT_HOUSEHOLDS",
           n = 5,
           style = "jenks", 
           title = "Total households") + 
   tm_borders(alpha = 0.5) 
 
-RADIO.map <- tm_shape(shan_join) + 
+RADIO.map <- tm_shape(shan_sf) + 
   tm_fill(col = "RADIO",
           n = 5,
           style = "jenks",
@@ -206,7 +206,7 @@ tmap_arrange(TT_HOUSEHOLDS.map, RADIO.map,
 Now, plot choropleth maps showing the distribution of total number of households and radio penetration rate
 
 ```{r}
-tm_shape(shan_join) +
+tm_shape(shan_sf) +
     tm_polygons(c("TT_HOUSEHOLDS", "RADIO_PR"),
                 style="jenks") +
     tm_facets(sync = TRUE, ncol = 2) +
@@ -233,7 +233,7 @@ The correlation plot above shows that COMPUTER_PR and INTERNET_PR are highly cor
 ### 4.1 Extracting Clustering Variables
 
 ```{r}
-cluster_vars <- shan_join %>%
+cluster_vars <- shan_sf %>%
   st_set_geometry(NULL) %>%
   select("TS.x", "RADIO_PR", "TV_PR", "LLPHONE_PR", "MPHONE_PR", "COMPUTER_PR")
 head(cluster_vars,10)
@@ -682,4 +682,36 @@ qtm(shan_sf_Gcluster, "CLUSTER")
 
 ### 7.1 Visualising individual clustering variable
 
-\* Note: column RADIO_PR is not found in the dataframe.
+```{r}
+ggplot(data = shan_sf_ngeo_cluster,
+       aes(x = CLUSTER, y = RADIO_PR)) +
+  geom_boxplot()
+```
+
+### 7.2 Multivariate Visualisation
+
+According to past studies, parallel coordinate plot can be used to reveal clustering variables by cluster very effectively.
+
+```{r}
+ggparcoord(data = shan_sf_ngeo_cluster, 
+           columns = c(17:21), 
+           scale = "globalminmax",
+           alphaLines = 0.2,
+           boxplot = TRUE, 
+           title = "Multiple Parallel Coordinates Plots of ICT Variables by Cluster") +
+  facet_grid(~ CLUSTER) + 
+  theme(axis.text.x = element_text(angle = 30))
+```
+
+Derive mean values of the clustering variable
+
+```{r}
+shan_sf_ngeo_cluster %>% 
+  st_set_geometry(NULL) %>%
+  group_by(CLUSTER) %>%
+  summarise(mean_RADIO_PR = mean(RADIO_PR),
+            mean_TV_PR = mean(TV_PR),
+            mean_LLPHONE_PR = mean(LLPHONE_PR),
+            mean_MPHONE_PR = mean(MPHONE_PR),
+            mean_COMPUTER_PR = mean(COMPUTER_PR))
+```
