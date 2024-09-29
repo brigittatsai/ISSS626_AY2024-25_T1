@@ -168,6 +168,7 @@ Before the new variable is derived, the histogram was right-skewed. It is becaus
 #### 2.2.1 Joining geospatial data and aspatial data
 
 ```{r}
+#| eval: false
 shan_sf <- left_join(shan_sf, 
                      ict_derived, by=c("TS_PCODE"="TS_PCODE"))
   
