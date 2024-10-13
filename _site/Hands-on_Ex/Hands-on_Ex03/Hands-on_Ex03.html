@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Brigitta Karen Tsai">
+<meta name="dcterms.date" content="2024-09-07">
+
+<title>ISSS626-GAA - Hands-on Exercise 3</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">ISSS626-GAA</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Hands-on Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html">
+ <span class="dropdown-text">Hands-on Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html">
+ <span class="dropdown-text">Hands-on Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html">
+ <span class="dropdown-text">Hands-on Exercise 3</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html">
+ <span class="dropdown-text">Hands-on Exercise 4</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05.html">
+ <span class="dropdown-text">Hands-on Exercise 5</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html">
+ <span class="dropdown-text">Hands-on Exercise 6</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex08/Hands-on_Ex08.html">
+ <span class="dropdown-text">Hands-on Exercise 8</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">In-class Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex01/In-class_Ex01.html">
+ <span class="dropdown-text">In-class Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex02/In-class_Ex02.html">
+ <span class="dropdown-text">In-class Exercise 2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex03.html">
+ <span class="dropdown-text">In-class Exercise 3</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex04/In-class_Ex04.html">
+ <span class="dropdown-text">In-class Exercise 4</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex05/In-class_Ex05.html">
+ <span class="dropdown-text">In-class Exercise 5</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex06/In-class_Ex06.html">
+ <span class="dropdown-text">In-class Exercise 6</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Take-home Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html">
+ <span class="dropdown-text">Take-home Exercise 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html">
+ <span class="dropdown-text">Take-home Exercise 2</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#load-and-install-r-packages" id="toc-load-and-install-r-packages" class="nav-link active" data-scroll-target="#load-and-install-r-packages">Load and Install R Packages</a></li>
+  <li><a href="#data-import-and-preparation" id="toc-data-import-and-preparation" class="nav-link" data-scroll-target="#data-import-and-preparation">Data Import and Preparation</a></li>
+  <li><a href="#visualising-the-geospatial-data" id="toc-visualising-the-geospatial-data" class="nav-link" data-scroll-target="#visualising-the-geospatial-data">Visualising the Geospatial Data</a></li>
+  <li><a href="#network-kde-analysis-nkde" id="toc-network-kde-analysis-nkde" class="nav-link" data-scroll-target="#network-kde-analysis-nkde">Network KDE Analysis (NKDE)</a></li>
+  <li><a href="#network-constrained-g--and-k--function-analysis" id="toc-network-constrained-g--and-k--function-analysis" class="nav-link" data-scroll-target="#network-constrained-g--and-k--function-analysis">Network Constrained G- and K- Function Analysis</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Hands-on Exercise 3</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Brigitta Karen Tsai </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 7, 2024</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">September 13, 2024</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="load-and-install-r-packages" class="level3">
+<h3 class="anchored" data-anchor-id="load-and-install-r-packages">Load and Install R Packages</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, spNetwork, tmap, tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="data-import-and-preparation" class="level3">
+<h3 class="anchored" data-anchor-id="data-import-and-preparation">Data Import and Preparation</h3>
+<p><strong>Import Punggol_St dataset</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>network <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>, </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">layer=</span><span class="st">"Punggol_St"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `Punggol_St' from data source 
+  `C:\brigittatsai\ISSS626_AY2024-25_T1\Hands-on_Ex\Hands-on_Ex03\data\geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 2642 features and 2 fields
+Geometry type: LINESTRING
+Dimension:     XY
+Bounding box:  xmin: 34038.56 ymin: 40941.11 xmax: 38882.85 ymax: 44801.27
+Projected CRS: SVY21 / Singapore TM</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>network</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 2642 features and 2 fields
+Geometry type: LINESTRING
+Dimension:     XY
+Bounding box:  xmin: 34038.56 ymin: 40941.11 xmax: 38882.85 ymax: 44801.27
+Projected CRS: SVY21 / Singapore TM
+First 10 features:
+     LINK_ID                   ST_NAME                       geometry
+1  116130894                PUNGGOL RD LINESTRING (36546.89 44574....
+2  116130897 PONGGOL TWENTY-FOURTH AVE LINESTRING (36546.89 44574....
+3  116130901   PONGGOL SEVENTEENTH AVE LINESTRING (36012.73 44154....
+4  116130902   PONGGOL SEVENTEENTH AVE LINESTRING (36062.81 44197....
+5  116130907           PUNGGOL CENTRAL LINESTRING (36131.85 42755....
+6  116130908                PUNGGOL RD LINESTRING (36112.93 42752....
+7  116130909           PUNGGOL CENTRAL LINESTRING (36127.4 42744.5...
+8  116130910               PUNGGOL FLD LINESTRING (35994.98 42428....
+9  116130911               PUNGGOL FLD LINESTRING (35984.97 42407....
+10 116130912            EDGEFIELD PLNS LINESTRING (36200.87 42219....</code></pre>
+</div>
+</div>
+<p><strong>Import Punggol_CC dataset</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>childcare <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">layer=</span><span class="st">"Punggol_CC"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `Punggol_CC' from data source 
+  `C:\brigittatsai\ISSS626_AY2024-25_T1\Hands-on_Ex\Hands-on_Ex03\data\geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 61 features and 1 field
+Geometry type: POINT
+Dimension:     XYZ
+Bounding box:  xmin: 34423.98 ymin: 41503.6 xmax: 37619.47 ymax: 44685.77
+z_range:       zmin: 0 zmax: 0
+Projected CRS: SVY21 / Singapore TM</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>childcare</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 61 features and 1 field
+Geometry type: POINT
+Dimension:     XYZ
+Bounding box:  xmin: 34423.98 ymin: 41503.6 xmax: 37619.47 ymax: 44685.77
+z_range:       zmin: 0 zmax: 0
+Projected CRS: SVY21 / Singapore TM
+First 10 features:
+      Name                      geometry
+1   kml_10 POINT Z (36173.81 42550.33 0)
+2   kml_99 POINT Z (36479.56 42405.21 0)
+3  kml_100 POINT Z (36618.72 41989.13 0)
+4  kml_101 POINT Z (36285.37 42261.42 0)
+5  kml_122  POINT Z (35414.54 42625.1 0)
+6  kml_161 POINT Z (36545.16 42580.09 0)
+7  kml_172 POINT Z (35289.44 44083.57 0)
+8  kml_188 POINT Z (36520.56 42844.74 0)
+9  kml_205  POINT Z (36924.01 41503.6 0)
+10 kml_222 POINT Z (37141.76 42326.36 0)</code></pre>
+</div>
+</div>
+</section>
+<section id="visualising-the-geospatial-data" class="level3">
+<h3 class="anchored" data-anchor-id="visualising-the-geospatial-data">Visualising the Geospatial Data</h3>
+<p><strong>Plot the network data</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">st_geometry</span>(network))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(childcare,<span class="at">add=</span>T,<span class="at">col=</span><span class="st">'red'</span>,<span class="at">pch =</span> <span class="dv">19</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex03_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Visualise with high cartographic quality and interactive manner</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">'plot'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>tmap mode set to plotting</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(childcare) <span class="sc">+</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>() <span class="sc">+</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(network) <span class="sc">+</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex03_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">'plot'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>tmap mode set to plotting</code></pre>
+</div>
+</div>
+</section>
+<section id="network-kde-analysis-nkde" class="level3">
+<h3 class="anchored" data-anchor-id="network-kde-analysis-nkde">Network KDE Analysis (NKDE)</h3>
+<p>Perform NKDE analysis using functions provided in <strong>spNetwork</strong> package</p>
+<section id="preparing-the-lixels-objects" class="level4">
+<h4 class="anchored" data-anchor-id="preparing-the-lixels-objects">Preparing the lixels objects</h4>
+<p>Before computing NKDE, the SpatialLines object need to be cut into <strong>lixels</strong> with a specified minimal distance using lixelize_lines()</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>lixels <span class="ot">&lt;-</span> <span class="fu">lixelize_lines</span>(network, </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                         <span class="dv">700</span>, </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">mindist =</span> <span class="dv">350</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>length of lixel = 700m</p>
+<p>minimum length of a lixel = 350</p>
+</section>
+<section id="generating-line-centre-points" class="level4">
+<h4 class="anchored" data-anchor-id="generating-line-centre-points">Generating line centre points</h4>
+<p>lines_center() function will be used to generate a <strong>SpatialPointsDataFrame (i.e samples)</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="fu">lines_center</span>(lixels) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(samples)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2645    4</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(childcare)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 61  2</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(network)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2642    3</code></pre>
+</div>
+</div>
+</section>
+<section id="performing-nkde" class="level4">
+<h4 class="anchored" data-anchor-id="performing-nkde">Performing NKDE</h4>
+<p>The original code results in error due to inconsistent number of rows.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>densities <span class="ot">&lt;-</span> <span class="fu">nkde</span>(network, </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">events =</span> childcare,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">w =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(childcare)),</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">samples =</span> samples,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">kernel_name =</span> <span class="st">"quartic"</span>,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">method =</span> <span class="st">"simple"</span>,</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">bw =</span> <span class="dv">300</span>,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sparse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>densities</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   [1] 5.648808e-06 8.043564e-06 9.625771e-06 7.941217e-06 7.388859e-06
+   [6] 6.667590e-06 6.750510e-06 0.000000e+00 0.000000e+00 6.324102e-06
+  [11] 4.665211e-06 6.390101e-06 3.856488e-06 1.886308e-06 6.641543e-06
+  [16] 5.112845e-06 3.370457e-06 1.161082e-06 4.472785e-10 0.000000e+00
+  [21] 0.000000e+00 4.276570e-07 4.573022e-07 7.565729e-07 1.827323e-06
+  [26] 4.394540e-06 4.595441e-06 7.304013e-08 6.591095e-06 5.122921e-06
+  [31] 4.755350e-06 6.471551e-06 0.000000e+00 0.000000e+00 9.547922e-06
+  [36] 1.086792e-05 9.725573e-06 0.000000e+00 9.543348e-06 1.207786e-05
+  [41] 7.846825e-06 1.091788e-08 6.333373e-09 0.000000e+00 1.263143e-05
+  [46] 5.052421e-06 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+  [51] 0.000000e+00 0.000000e+00 5.811446e-06 2.233242e-06 3.916132e-06
+  [56] 4.734708e-06 7.954862e-06 8.123057e-06 8.731023e-06 9.337524e-06
+  [61] 1.000037e-05 9.741008e-06 7.975623e-06 4.516284e-06 5.512259e-06
+  [66] 4.967097e-06 2.646127e-06 2.860138e-06 9.040804e-07 9.842616e-07
+  [71] 3.133359e-06 1.923401e-06 7.365166e-07 4.025939e-06 0.000000e+00
+  [76] 1.287038e-06 0.000000e+00 0.000000e+00 9.290541e-06 1.007498e-06
+  [81] 5.924093e-06 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+  [86] 0.000000e+00 2.327924e-08 0.000000e+00 0.000000e+00 0.000000e+00
+  [91] 1.009113e-05 9.330074e-06 2.484010e-06 1.423441e-06 6.561194e-07
+  [96] 7.929841e-07 0.000000e+00 2.093441e-06 7.480824e-09 5.541171e-07
+ [101] 1.118482e-06 1.258237e-06 1.604056e-06 6.073063e-07 9.010316e-07
+ [106] 6.795234e-06 7.371569e-07 9.036739e-07 1.404017e-06 1.476281e-06
+ [111] 0.000000e+00 7.552458e-06 5.407802e-06 6.767134e-06 5.966529e-06
+ [116] 7.067033e-06 6.789947e-06 5.419633e-06 5.976946e-06 0.000000e+00
+ [121] 6.102150e-06 8.961284e-06 1.481799e-05 1.428359e-05 0.000000e+00
+ [126] 2.274458e-07 0.000000e+00 0.000000e+00 6.983444e-06 6.396622e-06
+ [131] 6.969490e-06 3.398040e-06 0.000000e+00 0.000000e+00 7.360835e-07
+ [136] 0.000000e+00 0.000000e+00 7.264492e-06 8.243800e-06 1.059490e-05
+ [141] 1.354084e-05 7.830685e-06 9.116568e-06 8.740052e-06 8.331907e-06
+ [146] 7.266905e-06 7.776928e-06 7.563941e-06 1.326846e-05 8.336378e-09
+ [151] 1.073144e-05 7.577754e-06 1.061065e-05 1.055216e-05 4.384032e-08
+ [156] 4.123350e-09 0.000000e+00 1.550120e-05 0.000000e+00 0.000000e+00
+ [161] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [166] 9.513979e-06 1.060802e-05 8.925998e-06 7.891832e-06 7.988997e-06
+ [171] 6.997645e-06 1.017131e-05 9.509901e-06 1.024313e-05 9.419618e-06
+ [176] 3.561382e-06 8.450478e-06 0.000000e+00 1.818777e-05 7.219965e-06
+ [181] 5.427760e-07 9.985831e-06 9.156265e-07 0.000000e+00 2.487664e-06
+ [186] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [191] 0.000000e+00 2.953419e-06 0.000000e+00 2.804127e-07 1.378344e-06
+ [196] 1.433903e-06 1.555533e-06 0.000000e+00 9.180060e-08 0.000000e+00
+ [201] 0.000000e+00 0.000000e+00 0.000000e+00 9.899035e-06 1.035039e-05
+ [206] 1.041448e-05 1.016036e-05 0.000000e+00 0.000000e+00 0.000000e+00
+ [211] 1.040153e-05 1.003242e-05 6.224950e-06 2.238817e-06 0.000000e+00
+ [216] 3.880371e-10 1.280042e-05 1.250029e-05 1.517078e-05 9.377700e-06
+ [221] 7.650948e-06 1.252570e-05 1.074895e-05 6.371028e-06 8.767137e-06
+ [226] 1.289391e-05 1.243188e-05 1.175828e-06 3.047081e-07 6.851151e-06
+ [231] 1.272513e-06 8.730318e-06 8.032843e-06 6.841138e-06 6.550320e-06
+ [236] 0.000000e+00 6.316815e-06 6.107528e-06 1.399946e-05 2.105690e-06
+ [241] 4.352371e-06 3.355275e-06 2.691514e-06 3.132532e-06 8.583138e-07
+ [246] 2.371267e-06 1.385024e-05 1.463085e-08 0.000000e+00 1.264984e-07
+ [251] 8.904023e-08 1.524620e-07 2.056223e-08 7.769217e-07 4.611708e-07
+ [256] 0.000000e+00 0.000000e+00 0.000000e+00 5.907572e-07 0.000000e+00
+ [261] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [266] 0.000000e+00 1.361893e-05 1.415589e-05 0.000000e+00 0.000000e+00
+ [271] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [276] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [281] 0.000000e+00 4.662895e-07 4.659998e-07 0.000000e+00 0.000000e+00
+ [286] 0.000000e+00 1.188993e-05 1.216448e-05 8.330480e-06 1.233566e-05
+ [291] 1.244129e-05 9.071806e-06 1.357128e-05 7.658303e-07 4.477240e-06
+ [296] 3.245812e-06 2.910240e-06 2.783757e-06 2.300451e-06 7.068771e-06
+ [301] 8.688865e-06 1.035142e-05 1.030145e-05 5.604298e-07 0.000000e+00
+ [306] 0.000000e+00 0.000000e+00 0.000000e+00 7.393260e-06 4.729534e-06
+ [311] 2.292687e-08 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [316] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [321] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [326] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [331] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [336] 0.000000e+00 0.000000e+00 0.000000e+00 1.429019e-05 1.046002e-07
+ [341] 7.974513e-06 2.018351e-05 1.891310e-05 1.965872e-05 0.000000e+00
+ [346] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 5.235837e-06
+ [351] 4.814570e-06 4.359922e-06 1.486168e-06 1.248254e-06 1.098141e-06
+ [356] 9.376912e-07 4.940108e-07 3.396647e-07 2.774330e-07 1.918472e-07
+ [361] 2.326932e-08 4.907703e-09 0.000000e+00 0.000000e+00 0.000000e+00
+ [366] 0.000000e+00 0.000000e+00 1.252907e-07 3.561189e-07 7.494233e-07
+ [371] 1.212292e-06 2.437430e-07 2.229911e-07 9.677452e-07 1.017105e-06
+ [376] 0.000000e+00 0.000000e+00 2.754847e-06 3.169081e-06 2.244073e-06
+ [381] 5.604892e-06 5.427298e-06 8.852378e-06 0.000000e+00 0.000000e+00
+ [386] 0.000000e+00 7.325714e-06 6.633080e-06 2.931999e-07 2.564181e-07
+ [391] 2.035477e-08 0.000000e+00 0.000000e+00 2.490757e-06 1.925295e-07
+ [396] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [401] 1.275477e-07 1.356315e-06 3.979938e-07 1.344211e-06 7.650344e-09
+ [406] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [411] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [416] 0.000000e+00 0.000000e+00 1.380251e-09 0.000000e+00 0.000000e+00
+ [421] 0.000000e+00 1.779454e-07 9.154676e-08 2.352737e-06 8.234427e-06
+ [426] 5.742345e-06 1.035092e-05 3.642255e-06 2.668063e-06 5.867248e-07
+ [431] 9.923396e-07 2.623963e-09 4.201349e-09 2.988945e-08 6.410789e-08
+ [436] 1.435731e-07 5.072668e-07 1.893530e-07 9.953178e-06 5.528812e-06
+ [441] 4.097293e-06 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [446] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [451] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [456] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [461] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [466] 0.000000e+00 7.474124e-06 8.816546e-06 9.565683e-06 1.010731e-05
+ [471] 0.000000e+00 4.945030e-08 0.000000e+00 0.000000e+00 0.000000e+00
+ [476] 9.820965e-06 1.009203e-05 0.000000e+00 7.939933e-08 0.000000e+00
+ [481] 0.000000e+00 1.036473e-05 1.040306e-05 0.000000e+00 0.000000e+00
+ [486] 3.446126e-06 0.000000e+00 0.000000e+00 4.655176e-06 0.000000e+00
+ [491] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [496] 0.000000e+00 0.000000e+00 2.398607e-08 1.464649e-06 2.485475e-07
+ [501] 0.000000e+00 0.000000e+00 4.353517e-07 7.608633e-08 1.764299e-06
+ [506] 1.466965e-05 1.388025e-05 1.311778e-05 1.282847e-05 9.460767e-06
+ [511] 1.433779e-05 2.138348e-06 3.607673e-07 1.744906e-06 1.427395e-06
+ [516] 3.197221e-06 5.792159e-06 0.000000e+00 2.838225e-06 3.489877e-07
+ [521] 4.363099e-06 2.764898e-06 1.099853e-07 1.478008e-07 4.063919e-07
+ [526] 8.638298e-06 1.018559e-05 9.545478e-06 8.045618e-06 6.764890e-06
+ [531] 6.514593e-06 6.351154e-06 1.299645e-05 1.100823e-05 1.290899e-05
+ [536] 1.298283e-05 1.283320e-05 1.265380e-05 1.228318e-05 1.475738e-06
+ [541] 1.047279e-06 1.024923e-06 2.942077e-06 1.359208e-06 1.617634e-06
+ [546] 2.338974e-06 1.691575e-06 8.326459e-06 1.375644e-05 1.236913e-06
+ [551] 1.044661e-06 1.608559e-05 1.521786e-05 1.499443e-05 1.398877e-05
+ [556] 1.427270e-05 1.500618e-05 0.000000e+00 0.000000e+00 0.000000e+00
+ [561] 0.000000e+00 0.000000e+00 0.000000e+00 5.779199e-06 5.890275e-06
+ [566] 9.578338e-08 1.289032e-07 1.361762e-08 0.000000e+00 9.578349e-08
+ [571] 6.382246e-06 5.906251e-06 1.040743e-05 3.080133e-06 8.494817e-06
+ [576] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [581] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [586] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [591] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [596] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 9.703177e-06
+ [601] 9.426398e-06 9.516735e-06 9.016401e-06 9.059149e-06 9.998878e-06
+ [606] 9.986091e-06 1.036127e-05 9.448834e-06 0.000000e+00 0.000000e+00
+ [611] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 2.154723e-06
+ [616] 0.000000e+00 1.077661e-05 1.023313e-05 1.045135e-05 9.601142e-06
+ [621] 9.863782e-06 7.026742e-06 9.511045e-06 5.779995e-06 4.649040e-06
+ [626] 3.563488e-06 2.551030e-06 1.835093e-06 1.099775e-05 9.447975e-06
+ [631] 9.026117e-06 9.166964e-06 1.400667e-05 1.282200e-05 1.304194e-05
+ [636] 1.344439e-05 1.228632e-05 1.148112e-05 1.058146e-05 1.003497e-05
+ [641] 8.928047e-06 8.713568e-06 6.841164e-06 1.192746e-05 1.245185e-05
+ [646] 1.279667e-05 1.204162e-05 7.855681e-06 9.455506e-06 1.088991e-05
+ [651] 7.153816e-06 8.689120e-07 3.634637e-06 7.729657e-06 5.743040e-06
+ [656] 5.687850e-06 1.007298e-05 9.123554e-06 7.996015e-06 8.616753e-06
+ [661] 9.034028e-06 5.398786e-08 2.115760e-06 8.481410e-06 6.378696e-06
+ [666] 6.311025e-06 0.000000e+00 4.972194e-06 0.000000e+00 7.444246e-07
+ [671] 8.445846e-06 8.537726e-06 7.104558e-06 1.038292e-05 1.028097e-05
+ [676] 1.032924e-05 1.041311e-05 0.000000e+00 0.000000e+00 0.000000e+00
+ [681] 0.000000e+00 0.000000e+00 3.250385e-07 8.889844e-06 8.527270e-06
+ [686] 6.641734e-06 6.649941e-07 4.207605e-06 3.633225e-06 4.356701e-06
+ [691] 9.439067e-06 1.062903e-05 3.364424e-06 1.552199e-07 0.000000e+00
+ [696] 0.000000e+00 0.000000e+00 8.989461e-06 1.370091e-07 0.000000e+00
+ [701] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [706] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 9.722916e-06
+ [711] 2.106584e-06 0.000000e+00 0.000000e+00 2.863317e-06 4.705626e-07
+ [716] 4.553028e-07 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [721] 0.000000e+00 0.000000e+00 1.304805e-05 1.495650e-05 2.439165e-06
+ [726] 4.913674e-06 5.279331e-06 0.000000e+00 1.480010e-06 0.000000e+00
+ [731] 0.000000e+00 8.125573e-06 0.000000e+00 2.655007e-07 0.000000e+00
+ [736] 0.000000e+00 1.665347e-05 1.597968e-05 2.054569e-05 0.000000e+00
+ [741] 5.626363e-06 0.000000e+00 0.000000e+00 4.812650e-06 7.047115e-06
+ [746] 7.781748e-06 9.970207e-06 3.656662e-06 3.016179e-06 2.982234e-06
+ [751] 3.343563e-06 5.258214e-06 7.483558e-06 8.510113e-06 5.705363e-07
+ [756] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [761] 0.000000e+00 0.000000e+00 9.507902e-06 1.008420e-05 1.019356e-05
+ [766] 1.038360e-05 1.037045e-05 9.059255e-06 5.461853e-06 6.975470e-06
+ [771] 3.107030e-06 3.190672e-08 1.466752e-06 0.000000e+00 0.000000e+00
+ [776] 0.000000e+00 0.000000e+00 1.200251e-05 6.848252e-06 6.962529e-06
+ [781] 6.604877e-06 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [786] 0.000000e+00 0.000000e+00 1.022874e-05 2.762714e-06 0.000000e+00
+ [791] 0.000000e+00 2.101801e-07 1.370968e-06 6.892882e-06 3.632157e-06
+ [796] 5.245850e-06 1.001594e-05 0.000000e+00 0.000000e+00 0.000000e+00
+ [801] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [806] 1.031135e-05 9.706098e-06 5.570608e-09 2.641029e-07 1.081474e-06
+ [811] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 7.930229e-07
+ [816] 7.320034e-06 2.576779e-06 4.778561e-06 0.000000e+00 0.000000e+00
+ [821] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 1.159472e-05
+ [826] 1.353353e-05 1.241493e-05 0.000000e+00 0.000000e+00 0.000000e+00
+ [831] 0.000000e+00 4.478103e-06 6.190704e-06 5.297158e-06 1.552675e-05
+ [836] 1.590688e-05 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [841] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [846] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 4.404419e-06
+ [851] 8.963804e-06 9.804212e-06 1.037842e-05 4.984388e-06 5.931130e-06
+ [856] 7.411783e-06 4.214503e-06 6.230200e-06 4.157192e-06 9.731251e-06
+ [861] 1.022288e-05 1.025150e-05 3.489921e-07 6.913814e-08 0.000000e+00
+ [866] 8.547536e-06 2.541071e-06 9.071679e-06 8.299752e-06 2.909065e-06
+ [871] 4.849542e-06 5.623857e-06 8.487411e-06 9.912025e-06 4.288217e-06
+ [876] 8.218320e-06 0.000000e+00 0.000000e+00 1.086293e-07 8.604997e-06
+ [881] 9.440151e-06 8.824143e-06 8.409234e-06 7.144119e-06 6.012360e-06
+ [886] 5.071393e-06 1.418785e-06 0.000000e+00 0.000000e+00 0.000000e+00
+ [891] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [896] 7.448520e-07 1.328418e-06 3.479736e-06 2.304507e-06 9.485616e-06
+ [901] 9.512351e-06 9.497262e-06 1.363656e-05 9.220339e-06 5.182549e-06
+ [906] 0.000000e+00 8.219493e-06 1.003176e-05 1.041516e-05 3.965281e-06
+ [911] 6.327159e-07 1.816735e-06 9.214176e-06 6.029407e-06 6.842952e-06
+ [916] 1.011529e-05 9.508524e-06 8.029093e-06 9.095150e-06 1.032569e-05
+ [921] 9.964978e-06 3.327295e-06 5.764746e-06 4.677757e-06 2.906484e-07
+ [926] 2.231608e-07 1.007681e-06 2.148432e-06 6.778222e-06 4.949689e-06
+ [931] 8.458046e-06 7.216217e-06 1.019816e-05 1.037043e-05 9.824590e-06
+ [936] 9.223569e-06 2.752193e-06 2.873558e-06 1.162988e-05 1.285603e-05
+ [941] 3.106021e-06 5.006603e-06 8.121856e-07 1.631804e-06 2.313698e-06
+ [946] 5.565109e-06 4.244523e-06 3.399404e-06 1.037575e-05 2.314091e-06
+ [951] 8.012609e-06 9.034989e-06 1.081030e-05 0.000000e+00 0.000000e+00
+ [956] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [961] 0.000000e+00 1.331796e-07 2.358737e-10 7.868455e-07 1.960693e-06
+ [966] 4.676007e-06 1.014571e-05 1.041590e-05 4.532115e-06 4.934196e-06
+ [971] 4.407338e-06 4.313355e-06 2.126563e-06 4.315648e-07 0.000000e+00
+ [976] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [981] 0.000000e+00 0.000000e+00 1.020200e-05 1.044332e-05 1.031082e-05
+ [986] 8.582008e-06 9.339924e-06 9.926090e-06 0.000000e+00 0.000000e+00
+ [991] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+ [996] 0.000000e+00 2.587836e-06 1.814273e-06 6.708164e-07 1.147448e-06
+[1001] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1006] 0.000000e+00 9.861640e-06 8.479338e-06 9.459180e-06 6.057439e-06
+[1011] 7.642913e-06 3.363919e-06 8.232473e-06 2.120115e-06 1.483591e-06
+[1016] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1021] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1026] 0.000000e+00 0.000000e+00 2.208037e-05 2.027613e-05 1.403993e-05
+[1031] 1.799806e-05 1.569929e-05 0.000000e+00 0.000000e+00 0.000000e+00
+[1036] 0.000000e+00 0.000000e+00 0.000000e+00 4.135828e-06 2.972898e-06
+[1041] 2.029262e-06 0.000000e+00 0.000000e+00 1.283490e-08 7.592107e-08
+[1046] 8.822654e-06 8.103419e-06 5.336264e-06 7.233650e-06 7.359499e-06
+[1051] 2.824410e-06 5.107018e-06 8.266100e-06 9.588052e-06 9.091637e-06
+[1056] 0.000000e+00 8.805461e-06 8.248921e-06 7.609025e-06 6.593032e-06
+[1061] 5.514508e-06 4.075353e-06 9.228373e-07 2.698708e-06 1.039119e-05
+[1066] 1.053067e-05 5.332639e-07 1.319392e-05 1.367985e-05 1.355604e-05
+[1071] 3.648551e-06 2.311096e-06 9.917200e-07 5.274501e-07 7.720514e-07
+[1076] 0.000000e+00 0.000000e+00 0.000000e+00 7.751350e-06 4.924519e-06
+[1081] 6.903827e-06 1.027175e-05 9.196256e-06 9.876896e-06 9.409519e-06
+[1086] 9.840299e-06 1.040430e-05 9.647452e-06 1.021144e-05 1.080179e-05
+[1091] 1.123129e-05 1.023792e-05 1.043631e-05 9.719383e-06 8.012761e-06
+[1096] 6.980585e-06 3.297060e-06 5.795761e-06 6.748933e-07 0.000000e+00
+[1101] 0.000000e+00 0.000000e+00 5.833470e-06 0.000000e+00 0.000000e+00
+[1106] 2.973111e-06 1.880668e-06 1.003331e-05 9.278179e-06 6.467606e-06
+[1111] 2.381541e-07 0.000000e+00 0.000000e+00 0.000000e+00 6.475164e-06
+[1116] 3.591724e-06 1.294937e-06 0.000000e+00 5.250134e-08 6.017156e-06
+[1121] 4.934272e-06 1.002399e-06 3.715691e-06 2.548308e-06 0.000000e+00
+[1126] 0.000000e+00 6.184312e-06 4.646219e-06 1.741602e-06 0.000000e+00
+[1131] 0.000000e+00 9.453378e-07 4.984769e-07 1.020053e-05 0.000000e+00
+[1136] 1.041375e-05 1.039600e-05 0.000000e+00 0.000000e+00 1.323857e-05
+[1141] 1.400002e-05 8.469544e-06 8.983373e-06 9.752775e-06 8.632423e-06
+[1146] 1.078042e-05 1.023660e-05 0.000000e+00 0.000000e+00 0.000000e+00
+[1151] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1156] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1161] 0.000000e+00 0.000000e+00 1.039548e-06 2.713623e-06 0.000000e+00
+[1166] 1.503942e-07 1.372847e-08 4.351777e-06 4.898759e-06 0.000000e+00
+[1171] 0.000000e+00 7.618485e-06 0.000000e+00 8.673570e-06 1.650837e-05
+[1176] 3.619755e-06 1.649979e-05 1.718384e-05 0.000000e+00 0.000000e+00
+[1181] 0.000000e+00 0.000000e+00 0.000000e+00 1.126343e-05 0.000000e+00
+[1186] 1.152535e-05 1.084981e-05 1.525803e-07 3.403010e-06 0.000000e+00
+[1191] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1196] 0.000000e+00 3.168893e-06 4.170995e-06 0.000000e+00 0.000000e+00
+[1201] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1206] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1211] 3.254177e-06 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1216] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1221] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1226] 0.000000e+00 0.000000e+00 0.000000e+00 1.966113e-07 1.801383e-05
+[1231] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1236] 0.000000e+00 3.620632e-08 2.334481e-06 0.000000e+00 0.000000e+00
+[1241] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1246] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1251] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1256] 0.000000e+00 0.000000e+00 0.000000e+00 1.408729e-08 0.000000e+00
+[1261] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1266] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1271] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1276] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1281] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1286] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1291] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1296] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1301] 0.000000e+00 0.000000e+00 1.291589e-05 1.241955e-05 2.354355e-05
+[1306] 0.000000e+00 3.155584e-07 2.121346e-05 1.281735e-07 1.620706e-06
+[1311] 6.231281e-06 5.800612e-06 6.548257e-06 1.140959e-06 2.015582e-06
+[1316] 1.049038e-05 4.344605e-06 1.459329e-06 1.292268e-05 1.277049e-05
+[1321] 8.182920e-06 9.208952e-06 1.078665e-05 1.258855e-05 0.000000e+00
+[1326] 1.409984e-05 1.438440e-05 1.085554e-05 1.277172e-05 1.511374e-05
+[1331] 1.498043e-05 2.156523e-06 8.797561e-06 1.060722e-05 7.259604e-06
+[1336] 9.126982e-06 9.896360e-06 3.017893e-06 1.308065e-06 0.000000e+00
+[1341] 1.417664e-06 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1346] 0.000000e+00 3.682246e-07 0.000000e+00 0.000000e+00 3.808205e-07
+[1351] 0.000000e+00 0.000000e+00 2.559100e-06 5.760566e-06 7.050439e-07
+[1356] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1361] 0.000000e+00 4.015682e-07 1.392171e-08 1.695990e-06 2.288556e-06
+[1366] 3.900369e-06 6.197923e-06 8.256796e-06 1.088213e-05 1.182483e-05
+[1371] 1.106265e-05 9.155095e-06 3.082199e-06 9.127944e-07 3.473559e-06
+[1376] 2.175129e-06 1.035373e-06 2.511633e-06 2.748676e-06 1.521573e-05
+[1381] 1.769389e-05 2.192474e-05 1.791330e-05 1.869265e-05 5.330534e-06
+[1386] 1.119220e-05 4.709294e-06 3.214649e-06 3.499431e-06 1.462925e-06
+[1391] 7.370297e-06 9.537465e-06 3.919226e-06 2.767551e-06 0.000000e+00
+[1396] 1.041666e-05 1.038445e-05 1.212505e-05 1.408244e-05 5.754397e-06
+[1401] 9.219508e-06 3.548211e-06 3.995328e-06 8.544454e-06 7.291913e-06
+[1406] 1.546572e-06 8.557232e-07 0.000000e+00 9.884442e-08 2.472640e-06
+[1411] 2.171603e-06 1.442720e-08 6.229036e-10 4.470802e-06 3.371458e-06
+[1416] 9.059142e-06 9.973398e-06 1.003187e-05 1.018170e-05 8.531782e-06
+[1421] 7.884321e-06 1.033237e-05 1.041381e-05 7.391374e-06 6.619330e-06
+[1426] 6.745730e-06 7.172783e-07 2.607941e-06 1.511980e-06 2.563496e-06
+[1431] 1.781666e-06 7.429174e-06 9.051523e-06 1.002909e-05 9.282269e-06
+[1436] 5.454126e-06 4.731902e-06 6.278599e-06 9.902273e-06 9.352468e-06
+[1441] 9.853366e-06 9.782858e-06 0.000000e+00 0.000000e+00 2.758870e-10
+[1446] 0.000000e+00 1.776212e-06 3.770438e-07 0.000000e+00 0.000000e+00
+[1451] 0.000000e+00 3.775644e-07 1.082736e-06 3.285657e-06 9.130868e-06
+[1456] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1461] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1466] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1471] 0.000000e+00 0.000000e+00 0.000000e+00 6.038492e-06 4.957829e-06
+[1476] 3.967742e-06 2.588187e-06 2.809804e-06 1.422463e-06 2.246497e-06
+[1481] 1.162314e-06 3.645728e-06 3.493999e-06 8.746210e-06 5.057010e-06
+[1486] 4.501631e-06 4.592560e-06 1.417447e-05 4.980528e-06 7.081275e-06
+[1491] 3.710477e-06 3.931106e-06 1.069867e-07 3.619539e-06 1.998947e-06
+[1496] 2.803468e-07 3.707520e-06 8.209397e-06 5.168557e-06 3.864181e-06
+[1501] 3.856934e-06 5.314802e-07 4.058706e-06 2.174134e-07 7.935511e-06
+[1506] 4.034094e-06 7.523582e-06 2.434150e-06 1.862128e-06 2.871759e-07
+[1511] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1516] 0.000000e+00 0.000000e+00 3.196508e-06 0.000000e+00 6.510726e-06
+[1521] 6.049970e-06 5.218577e-06 4.555141e-06 5.062066e-06 4.728128e-06
+[1526] 2.701329e-06 1.837112e-06 9.171253e-07 2.354728e-07 6.769594e-09
+[1531] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1536] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1541] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1546] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1551] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1556] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1561] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 2.807781e-06
+[1566] 5.832578e-06 8.301666e-06 0.000000e+00 6.659634e-07 7.962209e-06
+[1571] 7.631549e-06 6.621879e-06 0.000000e+00 0.000000e+00 0.000000e+00
+[1576] 2.179289e-07 9.173749e-07 8.900557e-07 9.854207e-06 1.003136e-05
+[1581] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1586] 0.000000e+00 0.000000e+00 6.426310e-06 6.283136e-06 6.647471e-06
+[1591] 6.336131e-06 6.821314e-06 4.607088e-06 1.960009e-06 2.867239e-06
+[1596] 7.130578e-06 9.998491e-06 7.408597e-06 0.000000e+00 0.000000e+00
+[1601] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1606] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 4.055780e-06
+[1611] 2.657840e-06 1.039589e-05 9.536081e-06 1.023172e-05 1.038792e-05
+[1616] 1.033204e-05 9.613304e-06 8.085734e-06 8.445228e-06 1.953562e-06
+[1621] 0.000000e+00 6.667748e-07 0.000000e+00 0.000000e+00 0.000000e+00
+[1626] 0.000000e+00 5.163353e-06 4.557951e-06 0.000000e+00 0.000000e+00
+[1631] 0.000000e+00 1.570224e-06 5.579503e-06 0.000000e+00 0.000000e+00
+[1636] 1.852754e-06 4.530567e-06 0.000000e+00 0.000000e+00 0.000000e+00
+[1641] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1646] 0.000000e+00 5.103624e-06 9.013082e-06 3.498525e-06 0.000000e+00
+[1651] 0.000000e+00 7.230311e-09 0.000000e+00 0.000000e+00 4.489134e-07
+[1656] 3.196897e-07 7.215731e-06 5.009852e-07 6.705077e-06 2.338110e-06
+[1661] 4.327209e-06 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1666] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 2.879274e-06
+[1671] 1.467672e-07 2.664532e-06 8.195756e-08 1.084301e-07 7.167108e-07
+[1676] 2.528426e-06 1.034483e-05 8.317053e-06 8.675797e-06 0.000000e+00
+[1681] 0.000000e+00 1.598699e-06 1.904688e-07 7.233300e-07 1.041272e-05
+[1686] 9.273468e-06 9.512285e-06 9.416161e-06 9.873955e-06 6.519160e-06
+[1691] 8.348440e-06 9.132323e-06 1.041207e-05 2.121173e-06 1.903608e-07
+[1696] 2.641480e-06 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1701] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1706] 0.000000e+00 5.190867e-07 1.157274e-07 7.438402e-07 1.848597e-06
+[1711] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 6.064827e-06
+[1716] 3.244855e-06 9.205488e-06 6.240821e-06 1.216683e-05 1.081599e-05
+[1721] 9.107790e-06 9.274852e-06 1.041661e-05 0.000000e+00 0.000000e+00
+[1726] 3.290110e-06 8.895753e-06 2.972905e-06 6.641152e-06 8.172786e-06
+[1731] 5.505595e-06 1.794685e-06 4.963522e-06 2.322824e-06 1.034024e-05
+[1736] 1.068743e-05 4.805790e-06 7.173910e-06 7.529045e-06 7.195679e-06
+[1741] 7.055755e-06 8.083740e-06 4.665921e-06 4.972983e-06 0.000000e+00
+[1746] 1.836181e-07 2.193535e-06 0.000000e+00 0.000000e+00 9.608758e-06
+[1751] 1.474651e-06 9.684071e-06 0.000000e+00 0.000000e+00 0.000000e+00
+[1756] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1761] 0.000000e+00 0.000000e+00 0.000000e+00 4.499477e-08 2.227616e-09
+[1766] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1771] 0.000000e+00 1.020520e-05 8.525855e-06 1.000953e-05 9.086139e-08
+[1776] 0.000000e+00 6.567077e-06 1.301294e-05 1.166415e-05 1.013729e-05
+[1781] 1.069413e-05 5.215248e-06 0.000000e+00 0.000000e+00 1.243373e-07
+[1786] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1791] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1796] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1801] 4.360693e-07 2.670470e-06 9.148644e-06 1.883976e-06 0.000000e+00
+[1806] 1.013104e-05 8.439630e-06 9.078846e-06 6.578169e-06 4.091480e-06
+[1811] 5.582714e-06 7.723797e-06 5.848927e-06 1.647575e-06 9.432358e-07
+[1816] 1.454636e-06 2.829140e-06 4.736389e-06 7.295130e-07 0.000000e+00
+[1821] 2.102267e-07 3.393224e-07 0.000000e+00 1.296728e-08 0.000000e+00
+[1826] 0.000000e+00 0.000000e+00 0.000000e+00 2.993527e-06 7.096754e-06
+[1831] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1836] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1841] 0.000000e+00 1.367299e-05 0.000000e+00 9.335480e-11 3.372617e-06
+[1846] 9.722275e-06 2.694878e-06 7.453403e-06 9.404256e-06 8.761485e-06
+[1851] 9.268918e-06 9.885764e-06 1.028951e-05 9.130222e-06 5.951792e-06
+[1856] 7.798781e-06 9.177655e-06 1.018846e-05 8.674905e-06 6.898451e-06
+[1861] 2.029281e-06 4.655665e-06 6.913672e-06 9.080946e-06 7.818297e-06
+[1866] 2.611707e-06 2.014073e-07 0.000000e+00 0.000000e+00 0.000000e+00
+[1871] 0.000000e+00 3.458005e-06 4.723615e-06 4.261147e-07 0.000000e+00
+[1876] 8.575837e-06 8.005926e-06 5.263399e-06 7.248873e-06 8.286233e-06
+[1881] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1886] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1891] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[1896] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 2.030934e-07
+[1901] 0.000000e+00 0.000000e+00 0.000000e+00 1.019186e-05 9.578470e-06
+[1906] 1.009475e-05 1.029528e-05 1.020583e-05 8.775772e-06 9.955939e-06
+[1911] 8.952179e-06 9.157464e-06 9.793196e-06 9.144694e-06 9.248004e-06
+[1916] 9.574294e-06 7.469655e-06 1.808926e-06 3.933176e-06 4.899720e-06
+[1921] 3.159605e-06 4.084537e-06 7.573797e-06 5.565158e-06 5.722303e-06
+[1926] 0.000000e+00 0.000000e+00 4.462440e-06 3.949847e-06 5.340140e-06
+[1931] 5.616320e-06 3.255642e-06 4.197119e-06 9.053801e-06 8.388992e-06
+[1936] 8.373404e-06 8.440974e-06 7.962375e-06 8.931154e-06 9.027252e-06
+[1941] 9.618611e-06 7.189498e-06 9.027945e-06 7.740849e-07 2.674324e-07
+[1946] 2.767669e-07 7.691344e-08 1.270425e-05 1.058095e-05 0.000000e+00
+[1951] 3.679524e-06 5.732789e-06 0.000000e+00 2.315594e-06 5.004319e-06
+[1956] 8.489659e-06 6.962464e-06 6.793513e-06 9.346684e-06 8.386131e-06
+[1961] 9.759273e-06 1.229588e-06 1.034254e-05 7.891249e-06 8.807448e-06
+[1966] 2.293502e-06 1.411212e-06 0.000000e+00 7.000024e-06 6.237339e-06
+[1971] 6.403278e-06 5.531138e-06 9.225676e-06 9.971660e-06 1.014328e-05
+[1976] 1.040606e-05 1.033202e-05 3.283073e-06 3.603591e-06 6.394499e-06
+[1981] 4.805694e-06 0.000000e+00 0.000000e+00 7.249661e-06 8.144595e-06
+[1986] 0.000000e+00 0.000000e+00 0.000000e+00 6.458597e-06 7.743293e-06
+[1991] 1.025887e-05 1.041052e-05 3.811882e-06 7.769960e-07 8.287224e-06
+[1996] 9.551660e-06 1.377537e-05 1.158204e-05 8.040770e-06 6.310838e-06
+[2001] 3.742070e-06 8.867071e-06 1.142788e-05 1.706549e-05 1.196034e-06
+[2006] 9.109192e-06 3.824053e-06 6.358739e-06 1.653418e-05 9.270193e-06
+[2011] 1.625360e-05 9.409620e-06 8.916380e-06 1.058660e-05 1.406222e-05
+[2016] 1.030814e-05 3.589165e-06 8.947415e-06 1.039919e-05 0.000000e+00
+[2021] 5.120189e-08 0.000000e+00 2.124985e-07 4.611252e-06 0.000000e+00
+[2026] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2031] 2.383387e-07 1.029582e-05 4.080432e-06 5.181509e-06 7.031368e-06
+[2036] 2.615006e-06 4.138990e-06 4.520573e-06 5.283577e-06 9.788228e-06
+[2041] 9.844572e-06 1.036710e-05 1.376511e-06 0.000000e+00 4.923598e-06
+[2046] 3.543022e-06 3.517562e-06 7.793416e-07 5.241475e-06 1.961623e-06
+[2051] 1.493294e-06 2.608894e-06 9.110116e-06 8.839528e-06 0.000000e+00
+[2056] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2061] 0.000000e+00 0.000000e+00 7.462787e-06 7.326468e-06 6.475270e-06
+[2066] 1.161075e-06 9.323927e-08 1.081548e-05 1.041356e-05 0.000000e+00
+[2071] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2076] 0.000000e+00 0.000000e+00 4.140687e-08 0.000000e+00 0.000000e+00
+[2081] 0.000000e+00 1.030337e-05 1.242119e-05 1.963951e-05 5.127524e-06
+[2086] 1.883177e-07 0.000000e+00 0.000000e+00 2.648492e-06 1.423678e-05
+[2091] 9.121036e-06 2.475944e-06 6.399420e-06 0.000000e+00 0.000000e+00
+[2096] 9.199197e-06 1.012082e-05 5.690568e-06 6.828345e-06 5.548878e-06
+[2101] 8.866201e-06 8.352272e-06 0.000000e+00 0.000000e+00 0.000000e+00
+[2106] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2111] 0.000000e+00 0.000000e+00 1.652944e-06 6.156632e-06 3.165850e-06
+[2116] 0.000000e+00 2.836977e-08 0.000000e+00 0.000000e+00 0.000000e+00
+[2121] 0.000000e+00 0.000000e+00 0.000000e+00 1.748980e-06 1.036679e-06
+[2126] 1.146988e-06 5.834543e-07 9.031474e-07 2.974665e-06 8.674486e-07
+[2131] 7.416651e-06 5.639775e-06 6.572764e-06 4.890901e-06 7.075242e-06
+[2136] 4.659795e-06 5.780035e-06 4.077884e-06 3.484031e-06 3.851326e-06
+[2141] 5.663241e-08 7.530359e-07 4.056638e-06 1.847619e-06 1.808318e-06
+[2146] 0.000000e+00 0.000000e+00 8.376708e-07 2.428306e-07 0.000000e+00
+[2151] 1.217966e-05 1.065892e-05 9.363160e-06 8.916940e-06 6.901423e-06
+[2156] 7.873610e-06 6.423918e-06 2.735962e-07 2.558712e-07 2.647178e-06
+[2161] 4.500027e-06 1.839887e-06 2.571151e-06 2.263898e-07 4.215711e-07
+[2166] 2.383735e-05 2.209756e-05 2.315020e-05 2.376418e-05 2.404742e-05
+[2171] 4.884853e-06 3.690604e-06 5.452050e-06 5.714078e-06 5.203997e-06
+[2176] 4.315728e-06 1.706968e-06 1.930170e-06 1.549019e-07 4.826360e-08
+[2181] 0.000000e+00 0.000000e+00 0.000000e+00 6.201776e-06 5.097981e-06
+[2186] 0.000000e+00 0.000000e+00 1.900622e-06 1.129397e-06 0.000000e+00
+[2191] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 2.194206e-06
+[2196] 2.498065e-07 3.548769e-07 1.867470e-08 3.391483e-07 7.766171e-09
+[2201] 3.606014e-06 0.000000e+00 1.335191e-07 0.000000e+00 0.000000e+00
+[2206] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2211] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2216] 1.375643e-06 1.295078e-06 1.054659e-06 6.400155e-07 2.058928e-06
+[2221] 4.527997e-06 6.985796e-06 8.070004e-06 4.275483e-06 7.958535e-06
+[2226] 1.008687e-08 5.331236e-09 0.000000e+00 0.000000e+00 0.000000e+00
+[2231] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 4.867809e-06
+[2236] 5.490313e-06 2.669900e-06 3.860935e-06 3.688296e-06 1.618882e-07
+[2241] 2.430925e-07 1.536672e-06 2.828182e-06 3.435589e-06 3.940779e-06
+[2246] 4.203045e-06 3.868132e-06 6.242667e-06 5.309568e-06 3.587519e-06
+[2251] 5.117949e-06 4.554071e-06 7.693162e-06 5.288336e-06 5.083935e-06
+[2256] 4.743727e-06 5.894091e-06 3.347887e-06 4.000371e-06 3.326037e-06
+[2261] 6.356765e-06 8.474968e-06 1.258842e-05 9.429377e-06 8.852382e-06
+[2266] 6.577139e-06 4.287744e-06 6.050758e-08 0.000000e+00 0.000000e+00
+[2271] 0.000000e+00 0.000000e+00 3.364909e-07 0.000000e+00 8.806148e-07
+[2276] 0.000000e+00 0.000000e+00 2.766247e-06 5.817740e-06 6.842579e-06
+[2281] 9.249756e-06 1.012834e-05 1.001254e-05 7.455699e-06 5.106485e-06
+[2286] 6.816785e-06 6.956064e-06 3.434628e-06 5.966482e-08 1.924503e-06
+[2291] 0.000000e+00 9.208894e-11 7.851142e-06 4.628881e-06 6.229904e-06
+[2296] 0.000000e+00 1.301256e-05 1.093425e-05 8.999380e-06 4.819082e-06
+[2301] 3.519082e-06 4.790812e-07 4.763287e-07 0.000000e+00 0.000000e+00
+[2306] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2311] 0.000000e+00 6.931564e-07 0.000000e+00 6.482684e-07 1.419098e-06
+[2316] 6.785235e-07 0.000000e+00 0.000000e+00 5.031479e-06 2.322263e-06
+[2321] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2326] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2331] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2336] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2341] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2346] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 2.490427e-06
+[2351] 4.048808e-06 1.005262e-05 9.853824e-06 1.009994e-05 6.475783e-06
+[2356] 6.233686e-07 7.148917e-06 7.957055e-06 7.166367e-06 7.069803e-06
+[2361] 7.616159e-06 8.109032e-06 8.549877e-06 8.815391e-06 7.249382e-06
+[2366] 8.836086e-06 8.438489e-06 9.057617e-06 9.494104e-06 0.000000e+00
+[2371] 0.000000e+00 0.000000e+00 4.342011e-06 8.702841e-06 1.332357e-06
+[2376] 8.831921e-06 2.048731e-08 1.356310e-06 3.845041e-06 1.604895e-06
+[2381] 1.066773e-06 1.431109e-06 8.576764e-07 0.000000e+00 0.000000e+00
+[2386] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2391] 0.000000e+00 9.020802e-06 6.978847e-06 8.068692e-06 7.609355e-06
+[2396] 6.412455e-06 6.353271e-06 1.002685e-05 9.602502e-06 9.500528e-06
+[2401] 8.819419e-06 5.492739e-06 6.573170e-06 1.041301e-05 1.031765e-05
+[2406] 0.000000e+00 0.000000e+00 7.486560e-06 7.648421e-06 3.126551e-07
+[2411] 1.790178e-06 5.529619e-06 0.000000e+00 0.000000e+00 0.000000e+00
+[2416] 0.000000e+00 1.897965e-07 0.000000e+00 0.000000e+00 0.000000e+00
+[2421] 4.813051e-08 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2426] 0.000000e+00 0.000000e+00 8.227645e-07 3.529212e-06 0.000000e+00
+[2431] 0.000000e+00 8.584390e-06 3.953761e-06 6.985060e-06 5.528699e-06
+[2436] 9.879315e-07 0.000000e+00 1.570830e-07 0.000000e+00 0.000000e+00
+[2441] 6.271885e-06 5.704448e-06 3.053861e-06 5.237258e-06 6.665169e-06
+[2446] 6.307808e-06 0.000000e+00 0.000000e+00 9.804906e-06 9.594666e-06
+[2451] 9.259807e-06 9.624184e-06 9.917548e-06 9.953812e-06 1.012604e-05
+[2456] 7.925626e-06 8.646030e-06 5.863713e-06 1.030039e-05 9.443149e-06
+[2461] 1.031712e-05 3.682964e-06 1.612595e-06 9.290930e-07 8.455791e-07
+[2466] 1.238590e-06 1.751028e-06 6.667387e-07 1.048516e-06 1.035195e-05
+[2471] 9.684071e-06 9.363437e-06 7.621019e-06 6.015875e-06 3.679512e-06
+[2476] 4.901170e-06 3.969410e-06 1.034719e-05 9.886146e-06 1.015206e-05
+[2481] 1.009510e-05 1.022500e-05 1.017596e-05 9.936316e-06 9.854762e-06
+[2486] 9.805529e-06 9.708742e-06 9.216351e-06 1.041311e-05 1.025708e-05
+[2491] 1.025742e-05 9.739851e-06 8.090729e-06 5.658929e-06 2.365888e-06
+[2496] 1.622757e-07 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2501] 0.000000e+00 9.394976e-08 0.000000e+00 0.000000e+00 0.000000e+00
+[2506] 4.222109e-06 5.882264e-06 1.017990e-05 8.689769e-06 9.814584e-06
+[2511] 4.497307e-06 1.607286e-06 1.033261e-05 1.030070e-05 1.040357e-05
+[2516] 1.016755e-05 6.390239e-06 6.488161e-06 8.207024e-06 7.479987e-06
+[2521] 9.624772e-06 8.815030e-06 0.000000e+00 1.035207e-05 1.077677e-05
+[2526] 1.390108e-05 8.315013e-06 1.083916e-05 6.164686e-06 1.123249e-05
+[2531] 2.696536e-06 0.000000e+00 1.880768e-07 0.000000e+00 0.000000e+00
+[2536] 0.000000e+00 1.942200e-06 5.152860e-07 5.821605e-06 1.184544e-05
+[2541] 1.911937e-06 4.412166e-06 2.469933e-06 2.051790e-06 3.495821e-06
+[2546] 2.045059e-06 3.953210e-06 8.164509e-06 0.000000e+00 1.211251e-06
+[2551] 3.844174e-06 7.915853e-06 9.819771e-06 1.003333e-05 1.097754e-05
+[2556] 9.170641e-07 0.000000e+00 2.630990e-07 8.582440e-06 0.000000e+00
+[2561] 2.071167e-05 9.097414e-06 8.025432e-06 5.739876e-06 6.912191e-08
+[2566] 7.361765e-06 8.166774e-06 5.220349e-06 1.336122e-06 5.178837e-06
+[2571] 6.469275e-06 1.821084e-05 1.654929e-05 8.076662e-06 1.386591e-05
+[2576] 3.352285e-06 4.110895e-06 4.270570e-06 7.305274e-06 9.381098e-06
+[2581] 8.039156e-06 7.751296e-06 7.557902e-06 6.785274e-06 4.050918e-06
+[2586] 6.723252e-06 6.929800e-06 9.376556e-06 8.406400e-06 0.000000e+00
+[2591] 0.000000e+00 8.631642e-06 3.688101e-06 2.135610e-06 0.000000e+00
+[2596] 4.862564e-06 8.255781e-06 3.235547e-06 1.041343e-05 6.624094e-06
+[2601] 1.609294e-05 1.202112e-05 9.459569e-06 9.233346e-06 1.843532e-05
+[2606] 1.515437e-05 1.167825e-05 6.856716e-06 0.000000e+00 0.000000e+00
+[2611] 0.000000e+00 0.000000e+00 2.106836e-06 1.073283e-06 1.611820e-07
+[2616] 8.918253e-07 1.883794e-06 4.009125e-06 6.042714e-06 2.685408e-06
+[2621] 0.000000e+00 0.000000e+00 1.016650e-05 1.031957e-05 1.708142e-06
+[2626] 5.874131e-07 8.733587e-06 5.294934e-06 6.464185e-06 4.253733e-06
+[2631] 2.534413e-08 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2636] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+[2641] 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00</code></pre>
+</div>
+</div>
+<section id="visualising-nkde" class="level5">
+<h5 class="anchored" data-anchor-id="visualising-nkde">Visualising NKDE</h5>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>samples<span class="sc">$</span>density <span class="ot">&lt;-</span> densities</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>lixels<span class="sc">$</span>density <span class="ot">&lt;-</span> densities</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Rescale the density value to no. of events per kilometre</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>samples<span class="sc">$</span>density <span class="ot">&lt;-</span> samples<span class="sc">$</span>density<span class="sc">*</span><span class="dv">1000</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>lixels<span class="sc">$</span>density <span class="ot">&lt;-</span> lixels<span class="sc">$</span>density<span class="sc">*</span><span class="dv">1000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">'plot'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>tmap mode set to plotting</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(lixels)<span class="sc">+</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_lines</span>(<span class="at">col=</span><span class="st">"density"</span>)<span class="sc">+</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(childcare)<span class="sc">+</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex03_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">'plot'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>tmap mode set to plotting</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="network-constrained-g--and-k--function-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="network-constrained-g--and-k--function-analysis">Network Constrained G- and K- Function Analysis</h3>
+<p>Ho: The observed spatial point events (i.e.&nbsp;distribution of childcare centres) are uniformly distributed over a street network in Punggol Planning Area.</p>
+<p>If null hypothesis is rejected, we may infer that the distribution of childcare centres are spatially interacting and dependent on each other, resulting in nonrandom patterns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>kfun_childcare <span class="ot">&lt;-</span> <span class="fu">kfunctions</span>(network, </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>                             childcare,</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">start =</span> <span class="dv">0</span>, </span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">end =</span> <span class="dv">1000</span>, </span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">step =</span> <span class="dv">50</span>, </span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">width =</span> <span class="dv">50</span>, </span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">nsim =</span> <span class="dv">50</span>, </span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>                             <span class="at">resolution =</span> <span class="dv">50</span>,</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>                             <span class="at">verbose =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>                             <span class="at">conf_int =</span> <span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>kfun_childcare<span class="sc">$</span>plotk</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Hands-on_Ex03_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
