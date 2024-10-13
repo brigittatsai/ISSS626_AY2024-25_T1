@@ -566,13 +566,363 @@ moran.test(thai_tourism$no_tourist_all,
            na.action=na.omit)
 ```
 
-## 6 Exploratory Data Analysis
+## 6 Local Measures of Spatial Association
+
+### 6.1 Local Indicators of Spatial Association (LISA)
+
+#### 6.1.1 Computing Contiguity Spatial Weights (QUEEN)
 
 ```{r}
-barplot(height = thai_tourism$revenue_all[order(-thai_tourism$revenue_all)][1:5],
-        names.arg = thai_tourism$province_eng[1:5],
-        col = "skyblue",
-        main = "Top 5 Tourism Revenue per Province",
-        xlab = "Category",
-        ylab = "Values")
+wm_q <- poly2nb(thai_tourism, 
+                queen=TRUE)
+summary(wm_q)
 ```
+
+#### 6.1.2 Row Standardized Weights Matrix
+
+```{r}
+rswm_q <- nb2listw(wm_q, 
+                   style="W", 
+                   zero.policy = TRUE)
+rswm_q
+```
+
+#### 6.1.3 Local Moran's I
+
+::: panel-tabset
+### Computing Local Moran's I
+
+```{r}
+fips <- order(thai_tourism$province_eng)
+localMI <- localmoran(thai_tourism$revenue_all, rswm_q)
+head(localMI)
+```
+
+```{r}
+printCoefmat(data.frame(
+  localMI[fips,], 
+  row.names=thai_tourism$province_eng[fips]),
+  check.names=FALSE)
+```
+
+```{r}
+thai_tourism.localMI <- cbind(thai_tourism,localMI) %>%
+  rename(Pr.Ii = Pr.z....E.Ii..)
+```
+
+### Local Moran's I Values
+
+```{r}
+tm_shape(thai_tourism.localMI) +
+  tm_fill(col = "Ii", 
+          style = "pretty",
+          palette = "RdBu",
+          title = "local moran statistics") +
+  tm_borders(alpha = 0.5)
+```
+
+### p-values
+
+```{r}
+tm_shape(thai_tourism.localMI) +
+  tm_fill(col = "Pr.Ii", 
+          breaks=c(-Inf, 0.001, 0.01, 0.05, 0.1, Inf),
+          palette="-Blues", 
+          title = "local Moran's I p-values") +
+  tm_borders(alpha = 0.5)
+```
+:::
+
+#### 6.1.4 Creating LISA Cluster Map
+
+```{r}
+nci <- moran.plot(thai_tourism$revenue_all, rswm_q,
+                  labels=as.character(thai_tourism$province_eng), 
+                  xlab="Revenue from Tourist", 
+                  ylab="Spatially Lag Revenue from Tourist")
+```
+
+As seen from the scatter plot, it can be seen that Chonburi, Phuket and Bangkok is way further from the cluster
+
+#### 6.1.5 Preparing LISA Map Classes
+
+```{r}
+quadrant <- vector(mode="numeric",length=nrow(localMI))
+```
+
+```{r}
+thai_tourism$lag_revenue <- lag.listw(rswm_q, thai_tourism$revenue_all)
+DV <- thai_tourism$lag_revenue - mean(thai_tourism$lag_revenue)     
+```
+
+Centering local Moran around the mean value
+
+```{r}
+LM_I <- localMI[,1] - mean(localMI[,1])    
+```
+
+Set a statistical significance level
+
+```{r}
+signif <- 0.05
+```
+
+```{r}
+quadrant[DV <0 & LM_I<0] <- 1 # low low
+quadrant[DV >0 & LM_I<0] <- 2 # high low
+quadrant[DV <0 & LM_I<0] <- 3 # low high
+quadrant[DV >0 & LM_I>0] <- 4 # high high
+```
+
+The non significant value of Moran will be placed in category 0
+
+```{r}
+quadrant[localMI[,5]>signif] <- 0
+```
+
+#### 6.1.6 Plotting LISA Map
+
+```{r}
+thai_tourism.localMI$quadrant <- quadrant
+colors <- c("#ffffff", "#2c7bb6", "#abd9e9", "#fdae61", "#d7191c")
+clusters <- c("insignificant", "low-low", "low-high", "high-low", "high-high")
+
+tm_shape(thai_tourism.localMI) +
+  tm_fill(col = "quadrant", 
+          style = "cat", 
+          palette = colors[c(sort(unique(quadrant)))+1], 
+          labels = clusters[c(sort(unique(quadrant)))+1],
+          popup.vars = c("")) +
+  tm_view(set.zoom.limits = c(11,17)) +
+  tm_borders(alpha=0.5)
+```
+
+From the LISA Map, we can see that all the provinces surrounding **Bangkok** is a low-high autocorrelation, which means that all the surrounding provinces are low outlier, whereas Bangkok is a high outlier in terms of revenue from all tourists.
+
+## 7 Hot Spot and Cold Spot Area Analysis
+
+### 7.1 Computing Local Gi\* Statistics
+
+```{r}
+wm_idw <- thai_tourism %>%
+  mutate(nb = include_self(
+    st_contiguity(geometry)),
+    wts = st_inverse_distance(nb, 
+                              geometry, 
+                              scale = 1,
+                              alpha = 1),
+         .before = 1)
+```
+
+```{r}
+HCSA <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    revenue_all, nb, wts, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+HCSA
+```
+
+### 7.2 Visualising Gi\*
+
+```{r}
+tmap_mode("plot")
+tm_shape(HCSA) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8))
+```
+
+### 7.3 Visualising p-value of HCSA
+
+```{r}
+tmap_mode("plot")
+tm_shape(HCSA) +
+  tm_fill("p_sim") + 
+  tm_borders(alpha = 0.5)
+```
+
+### 7.4 Visualising Hot Spot and Cold Spot Area
+
+```{r}
+HCSA_sig <- HCSA  %>%
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+tm_shape(HCSA) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(HCSA_sig) +
+  tm_fill("cluster") + 
+  tm_borders(alpha = 0.4)
+```
+
+**Findings:** There is no hotspot area in the plot above and there are coldspots identified in Ubon-Ratchathani, Yasothon, Roi Et and Mukdahan provinces.
+
+## 8 Correlation Analysis
+
+```{r}
+cluster_vars.cor = cor(tourism_data[,2:9])
+corrplot.mixed(cluster_vars.cor,
+         lower = "ellipse", 
+               upper = "number",
+               tl.pos = "lt",
+               diag = "l",
+               tl.col = "black")
+```
+
+From the correlation analysis, there is an interesting finding. Overall revenue are strongly correlated with number of foreign tourist, but it's less stronger with the number of thai tourists. This may be due to foreign tourists contributing more revenue and spending more money as compared to local tourists.
+
+## 9 Emerging Hotspot Analysis
+
+### 9.1 Creating Time Series Cube
+
+Let us create a time series cube based on the revenue generated from tourism in Thailand
+
+```{r}
+tourism_revenue <- tourism %>%
+  filter(variable %in% c("revenue_all"))
+```
+
+```{r}
+tourism_revenue <- left_join(boundary, tourism_revenue, by = c("province_eng"))
+```
+
+Derive a dataframe grouped by the year and province in Thailand
+
+```{r}
+tourism_revenue <- tourism_revenue %>%
+  group_by(year, province_eng, geometry) %>%
+  summarize(value = sum(value, na.rm = TRUE),
+            variable = first(variable))
+```
+
+```{r}
+tourism_revenue <- tourism_revenue %>%
+  pivot_wider(names_from = variable, values_from = value)
+```
+
+```{r}
+tourism_st <- spacetime(tourism_revenue, boundary,
+                      .loc_col = "province_eng",
+                      .time_col = "year")
+```
+
+```{r}
+is_spacetime_cube(tourism_st)
+```
+
+### 9.2 Computing Gi\*
+
+#### 9.2.1 Deriving the Spatial Weights
+
+```{r}
+tourism_nb <- tourism_st %>%
+  activate("geometry") %>%
+  mutate(nb = include_self(
+    st_contiguity(geometry)),
+    wt = st_inverse_distance(nb, 
+                             geometry, 
+                             scale = 1,
+                             alpha = 1),
+    .before = 1) %>%
+  set_nbs("nb") %>%
+  set_wts("wt")
+```
+
+#### 9.2.2 Computing Gi\*
+
+```{r}
+gi_stars <- tourism_nb %>% 
+  group_by(year) %>% 
+  mutate(gi_star = local_gstar_perm(
+    revenue_all, nb, wt)) %>% 
+  tidyr::unnest(gi_star)
+```
+
+```{r}
+gi_stars
+```
+
+### 9.3 Mann-Kendall Test
+
+#### 9.3.1 Hypothesis and Interpretation
+
+H0: There is no monotonic trend over time
+
+H1: Monotonic trend is present
+
+Reject null hypothesis if the p-value is smaller than alpha value
+
+Tau range interpretation:
+
+-   -1 = perfectly decreasing series
+
+-   1 = perfectly increasing series
+
+#### 9.3.2 Mann-Kendall Test on Gi
+
+Let us choose Bangkok to analyze as Bangkok has the highest revenue from tourism
+
+```{r}
+cbg <- gi_stars %>% 
+  ungroup() %>% 
+  filter(province_eng == "Bangkok") |> 
+  select(province_eng, year, gi_star)
+```
+
+```{r}
+ggplot(data = cbg, 
+       aes(x = year, 
+           y = gi_star)) +
+  geom_line() +
+  theme_light()
+```
+
+**Findings:**
+
+1.  From 2019 to 2022, the Gi\* value decreases, which indicates that there is an increasing trend towards cold spots during this period of time
+2.  From 2022 to 2023, the Gi\* value increases, which indicates that the spatial clustering increases towards hot spots in this period
+
+```{r}
+cbg %>%
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) %>% 
+  tidyr::unnest_wider(mk)
+```
+
+The p-value is 0.22, we do not reject null hypothesis and conclude that there is no monotonic trend (Bangkok)
+
+We can see the overall result per province using the following code
+
+```{r}
+ehsa <- gi_stars %>%
+  group_by(province_eng) %>%
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) %>%
+  tidyr::unnest_wider(mk)
+head(ehsa)
+```
+
+```{r}
+ehsa_desc <- ehsa %>%
+  arrange(desc(tau))
+
+head(ehsa_desc)
+```
+
+**Findings:** The shown sorted table is based on the Tau range, which shows that the value shown has increasing trend. The consistent growth indicates that there is potential growth in tourism revenue in these provinces.
+
+```{r}
+ehsa_asc <- ehsa %>%
+  arrange(tau)
+
+head(ehsa_asc)
+```
+
+**Findings:** The provinces shown in above table indicates that those are the provinces with decreasing series. It is interesting to find that Bangkok is part of the top 5 decreasing series even though Bangkok has the highest revenue in tourism. This indicates that the tourism sector should pay more attention to these provinces and avoid decreasing trend.
+
+## 10 Conclusion
+
+From the analysis, we can find that **Bangkok** area has a lot of tourism activity, but it doesnt show monotonic trend over time, which indicates that it is not an increasing trend and it fluctuates randomly over time. Under the hotspot and coldspot analysis, we can find that the Ubon-Ratchathani, Yasothon, Roi Et and Mukdahan provinces are considered as cold spots. This might indicate that these provinces lack of tourism infrastructure. It is a potential area for the Thailand tourism sector to pay more attention to and drive tourism traffic to the cold spots area and maintain stability of tourism activity in Bangkok area.

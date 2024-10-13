@@ -263,7 +263,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#row-standardised-weights-matrix" id="toc-row-standardised-weights-matrix" class="nav-link" data-scroll-target="#row-standardised-weights-matrix">5.2 Row-standardised weights matrix</a></li>
   <li><a href="#computing-global-morans-i" id="toc-computing-global-morans-i" class="nav-link" data-scroll-target="#computing-global-morans-i">5.3 Computing Global Moran’s I</a></li>
   </ul></li>
-  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis">6 Exploratory Data Analysis</a></li>
+  <li><a href="#local-measures-of-spatial-association" id="toc-local-measures-of-spatial-association" class="nav-link" data-scroll-target="#local-measures-of-spatial-association">6 Local Measures of Spatial Association</a>
+  <ul class="collapse">
+  <li><a href="#local-indicators-of-spatial-association-lisa" id="toc-local-indicators-of-spatial-association-lisa" class="nav-link" data-scroll-target="#local-indicators-of-spatial-association-lisa">6.1 Local Indicators of Spatial Association (LISA)</a></li>
+  </ul></li>
+  <li><a href="#hot-spot-and-cold-spot-area-analysis" id="toc-hot-spot-and-cold-spot-area-analysis" class="nav-link" data-scroll-target="#hot-spot-and-cold-spot-area-analysis">7 Hot Spot and Cold Spot Area Analysis</a>
+  <ul class="collapse">
+  <li><a href="#computing-local-gi-statistics" id="toc-computing-local-gi-statistics" class="nav-link" data-scroll-target="#computing-local-gi-statistics">7.1 Computing Local Gi* Statistics</a></li>
+  <li><a href="#visualising-gi" id="toc-visualising-gi" class="nav-link" data-scroll-target="#visualising-gi">7.2 Visualising Gi*</a></li>
+  <li><a href="#visualising-p-value-of-hcsa" id="toc-visualising-p-value-of-hcsa" class="nav-link" data-scroll-target="#visualising-p-value-of-hcsa">7.3 Visualising p-value of HCSA</a></li>
+  <li><a href="#visualising-hot-spot-and-cold-spot-area" id="toc-visualising-hot-spot-and-cold-spot-area" class="nav-link" data-scroll-target="#visualising-hot-spot-and-cold-spot-area">7.4 Visualising Hot Spot and Cold Spot Area</a></li>
+  </ul></li>
+  <li><a href="#correlation-analysis" id="toc-correlation-analysis" class="nav-link" data-scroll-target="#correlation-analysis">8 Correlation Analysis</a></li>
+  <li><a href="#emerging-hotspot-analysis" id="toc-emerging-hotspot-analysis" class="nav-link" data-scroll-target="#emerging-hotspot-analysis">9 Emerging Hotspot Analysis</a>
+  <ul class="collapse">
+  <li><a href="#creating-time-series-cube" id="toc-creating-time-series-cube" class="nav-link" data-scroll-target="#creating-time-series-cube">9.1 Creating Time Series Cube</a></li>
+  <li><a href="#computing-gi" id="toc-computing-gi" class="nav-link" data-scroll-target="#computing-gi">9.2 Computing Gi*</a></li>
+  <li><a href="#mann-kendall-test" id="toc-mann-kendall-test" class="nav-link" data-scroll-target="#mann-kendall-test">9.3 Mann-Kendall Test</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">10 Conclusion</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -297,7 +315,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">October 12, 2024</p>
+      <p class="date-modified">October 13, 2024</p>
     </div>
   </div>
     
@@ -1095,23 +1113,727 @@ Moran I statistic       Expectation          Variance
 </div>
 </section>
 </section>
-<section id="exploratory-data-analysis" class="level2">
-<h2 class="anchored" data-anchor-id="exploratory-data-analysis">6 Exploratory Data Analysis</h2>
+<section id="local-measures-of-spatial-association" class="level2">
+<h2 class="anchored" data-anchor-id="local-measures-of-spatial-association">6 Local Measures of Spatial Association</h2>
+<section id="local-indicators-of-spatial-association-lisa" class="level3">
+<h3 class="anchored" data-anchor-id="local-indicators-of-spatial-association-lisa">6.1 Local Indicators of Spatial Association (LISA)</h3>
+<section id="computing-contiguity-spatial-weights-queen" class="level4">
+<h4 class="anchored" data-anchor-id="computing-contiguity-spatial-weights-queen">6.1.1 Computing Contiguity Spatial Weights (QUEEN)</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(<span class="at">height =</span> thai_tourism<span class="sc">$</span>revenue_all[<span class="fu">order</span>(<span class="sc">-</span>thai_tourism<span class="sc">$</span>revenue_all)][<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>],</span>
-<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">names.arg =</span> thai_tourism<span class="sc">$</span>province_eng[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>],</span>
-<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">col =</span> <span class="st">"skyblue"</span>,</span>
-<span id="cb94-4"><a href="#cb94-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">main =</span> <span class="st">"Top 5 Tourism Revenue per Province"</span>,</span>
-<span id="cb94-5"><a href="#cb94-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">"Category"</span>,</span>
-<span id="cb94-6"><a href="#cb94-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">ylab =</span> <span class="st">"Values"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>wm_q <span class="ot">&lt;-</span> <span class="fu">poly2nb</span>(thai_tourism, </span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">queen=</span><span class="cn">TRUE</span>)</span>
+<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(wm_q)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Neighbour list object:
+Number of regions: 77 
+Number of nonzero links: 352 
+Percentage nonzero weights: 5.93692 
+Average number of links: 4.571429 
+1 region with no links:
+67
+2 disjoint connected subgraphs
+Link number distribution:
+
+ 0  1  2  3  4  5  6  7  8  9 
+ 1  1  5 17 15 17 10  5  4  2 
+1 least connected region:
+14 with 1 link
+2 most connected regions:
+29 51 with 9 links</code></pre>
+</div>
+</div>
+</section>
+<section id="row-standardized-weights-matrix" class="level4">
+<h4 class="anchored" data-anchor-id="row-standardized-weights-matrix">6.1.2 Row Standardized Weights Matrix</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>rswm_q <span class="ot">&lt;-</span> <span class="fu">nb2listw</span>(wm_q, </span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">style=</span><span class="st">"W"</span>, </span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">zero.policy =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>rswm_q</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Characteristics of weights list object:
+Neighbour list object:
+Number of regions: 77 
+Number of nonzero links: 352 
+Percentage nonzero weights: 5.93692 
+Average number of links: 4.571429 
+1 region with no links:
+67
+2 disjoint connected subgraphs
+
+Weights style: W 
+Weights constants summary:
+   n   nn S0       S1      S2
+W 76 5776 76 36.26113 315.652</code></pre>
+</div>
+</div>
+</section>
+<section id="local-morans-i" class="level4">
+<h4 class="anchored" data-anchor-id="local-morans-i">6.1.3 Local Moran’s I</h4>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Computing Local Moran’s I</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Local Moran’s I Values</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">p-values</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>fips <span class="ot">&lt;-</span> <span class="fu">order</span>(thai_tourism<span class="sc">$</span>province_eng)</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>localMI <span class="ot">&lt;-</span> <span class="fu">localmoran</span>(thai_tourism<span class="sc">$</span>revenue_all, rswm_q)</span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(localMI)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>           Ii          E.Ii      Var.Ii       Z.Ii  Pr(z != E(Ii))
+1 -1.83799860 -0.7673501158 2.138319789 -0.7321677 0.4640662019682
+2 -0.84568638 -0.0006847924 0.025995168 -5.2409644 0.0000001597396
+3 -0.42360090 -0.0007593821 0.014022725 -3.5707662 0.0003559385446
+4 -0.28298520 -0.0008584885 0.010273957 -2.7833981 0.0053792760572
+5  0.02378074 -0.0001327355 0.001343105  0.6525108 0.5140716849302
+6  0.05716301 -0.0010121113 0.018684887  0.4255906 0.6704061909293</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">printCoefmat</span>(<span class="fu">data.frame</span>(</span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>  localMI[fips,], </span>
+<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">row.names=</span>thai_tourism<span class="sc">$</span>province_eng[fips]),</span>
+<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names=</span><span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                     Ii           E.Ii         Var.Ii
+Amnat Charoen             0.07083095475 -0.00105904034  0.02642916197
+Ang Thong                 0.05716300575 -0.00101211133  0.01868488708
+Bangkok                  -1.83799860222 -0.76735011581  2.13831978877
+Bueng Kan                 0.06881951236 -0.00099856395  0.02492143607
+Buriram                   0.04116994539 -0.00065817138  0.00958894589
+Chachoengsao             -0.22456652797 -0.00065230008  0.00568869225
+Chainat                   0.06867867168 -0.00098407156  0.01816774650
+Chaiyaphum                0.03835985563 -0.00092325362  0.01704597461
+Chanthaburi              -0.04814604279 -0.00050560248  0.00736728315
+Chiang Mai               -0.13450098001 -0.00900973280  0.13016646377
+Chiang Rai                0.01339027016 -0.00019489395  0.00486793509
+Chonburi                 -0.25218265411 -0.04201669166  1.00556665353
+Chumphon                 -0.02346538797 -0.00066103325  0.01650316319
+Kalasin                   0.06188701939 -0.00100372369  0.01201031217
+Kamphaeng Phet            0.06208705355 -0.00095083753  0.01384876288
+Kanchanaburi             -0.01074825111 -0.00002760711  0.00040246374
+Khon Kaen                 0.02447102795 -0.00016316642  0.00124687144
+Krabi                     0.00647413741 -0.00235563243  0.04342954175
+Lampang                   0.01006584072 -0.00070044464  0.00708353470
+Lamphun                  -0.03456619366 -0.00094275090  0.02352980870
+Loei                      0.04652147598 -0.00073364096  0.00878094156
+Lopburi                   0.04536393836 -0.00066944698  0.00583812969
+Mae Hong Son             -0.07005053891 -0.00067593902  0.02565931441
+Maha Sarakham             0.06312827899 -0.00100611120  0.01465300243
+Mukdahan                  0.06848945114 -0.00083509460  0.00999422441
+Nakhon Nayok              0.04199015929 -0.00061097167  0.00890171030
+Nakhon Pathom            -0.21489161570 -0.00068217102  0.00689886133
+Nakhon Phanom             0.06804738203 -0.00088800034  0.02216452217
+Nakhon Ratchasima         0.01076889014 -0.00003334270  0.00029096091
+Nakhon Sawan              0.05851084146 -0.00072892287  0.00635643021
+Nakhon Si Thammarat      -0.01515857173 -0.00026910394  0.00392212091
+Nan                       0.06577903280 -0.00081505703  0.02034533972
+Narathiwat                0.07090949568 -0.00093157452  0.03535444476
+Nong Bua Lamphu           0.04940749978 -0.00106478228  0.02657230378
+Nong Khai                 0.05455144398 -0.00070366504  0.01299457961
+Nonthaburi               -0.42360089900 -0.00075938213  0.01402272512
+Pathum Thani             -0.28298519751 -0.00085848855  0.01027395737
+Pattani                   0.03033040601 -0.00101893481  0.02542931850
+Phang Nga                 0.00535962987 -0.00001131013  0.00028254911
+Phatthalung               0.02253659477 -0.00090214141  0.01665653314
+Phayao                    0.04127232904 -0.00093588252  0.01727892278
+Phetchabun                0.04206480973 -0.00048503171  0.00490614010
+Phetchaburi              -0.00701853785 -0.00006659779  0.00166364987
+Phichit                   0.05997445991 -0.00096541858  0.01782371136
+Phitsanulok               0.04681828255 -0.00047233482  0.00565484930
+Phra Nakhon Si Ayutthaya  0.02378073991 -0.00013273550  0.00134310492
+Phrae                     0.06585844780 -0.00089707848  0.01306647591
+Phuket                    0.00000000000  0.00000000000  0.00000000000
+Prachinburi               0.04194069463 -0.00072835530  0.01345020233
+Prachuap Khiri Khan      -0.01444030941 -0.00046885706  0.01780196628
+Ranong                   -0.01580883037 -0.00085754128  0.02140491550
+Ratchaburi                0.03039770577 -0.00078959962  0.01150222035
+Rayong                   -0.00373054925 -0.00000028939  0.00001099288
+Roi Et                    0.07316891133 -0.00097817034  0.01170484641
+Sa Kaeo                   0.04167731057 -0.00066355668  0.00966735249
+Sakon Nakhon              0.06323140237 -0.00087858230  0.01051421782
+Samut Prakan             -0.84568638003 -0.00068479243  0.02599516847
+Samut Sakhon             -0.46727833706 -0.00095876757  0.01770103720
+Samut Songkhram           0.03546514819 -0.00075636501  0.01888138672
+Saraburi                  0.03568908684 -0.00058367125  0.00850418209
+Satun                     0.01727953128 -0.00047189614  0.01178345101
+Sing Buri                 0.06849618922 -0.00101639120  0.01480256807
+Sisaket                   0.06869155659 -0.00094121430  0.01737726911
+Songkhla                 -0.04369438435 -0.00049426294  0.00720213315
+Sukhothai                 0.05929615194 -0.00082070118  0.00982210874
+Suphan Buri               0.04352690070 -0.00063973702  0.00646999691
+Surat Thani              -0.01294059772 -0.00190596312  0.02773344116
+Surin                     0.06699652147 -0.00087318251  0.01612232273
+Tak                       0.02038725673 -0.00057672306  0.00440533087
+Trang                     0.00879964494 -0.00055674285  0.01028287975
+Trat                      0.02097512255 -0.00015065121  0.01159839596
+Ubon Ratchathani          0.06005136322 -0.00061752391  0.01541759291
+Udon Thani                0.04043400005 -0.00039635734  0.00474559843
+Uthai Thani               0.04834655198 -0.00096439423  0.01404602297
+Uttaradit                 0.06290286784 -0.00092453752  0.01706965728
+Yala                      0.02976267619 -0.00085365356  0.02130795790
+Yasothon                  0.07248548039 -0.00103478400  0.01507016045
+                                   Z.Ii Pr.z....E.Ii..
+Amnat Charoen             0.44220816550         0.6583
+Ang Thong                 0.42559060009         0.6704
+Bangkok                  -0.73216772361         0.4641
+Bueng Kan                 0.44226375235         0.6583
+Buriram                   0.42715242646         0.6693
+Chachoengsao             -2.96876260231         0.0030
+Chainat                   0.51683276920         0.6053
+Chaiyaphum                0.30088111946         0.7635
+Chanthaburi              -0.55503719283         0.5789
+Chiang Mai               -0.34782747363         0.7280
+Chiang Rai                0.19471190228         0.8456
+Chonburi                 -0.20958343283         0.8340
+Chumphon                 -0.17751464598         0.8591
+Kalasin                   0.57386478914         0.5661
+Kamphaeng Phet            0.53566859548         0.5922
+Kanchanaburi             -0.53438898432         0.5931
+Khon Kaen                 0.69763381711         0.4854
+Krabi                     0.04236983376         0.9662
+Lampang                   0.12792071369         0.8982
+Lamphun                  -0.21919618006         0.8265
+Loei                      0.50428761107         0.6141
+Lopburi                   0.60247085905         0.5469
+Mae Hong Son             -0.43308981172         0.6649
+Maha Sarakham             0.52981915887         0.5962
+Mukdahan                  0.69344573929         0.4880
+Nakhon Nayok              0.45152770242         0.6516
+Nakhon Pathom            -2.57899148032         0.0099
+Nakhon Phanom             0.46303412841         0.6433
+Nakhon Ratchasima         0.63328064352         0.5266
+Nakhon Sawan              0.74303056745         0.4575
+Nakhon Si Thammarat      -0.23774899263         0.8121
+Nan                       0.46687779020         0.6406
+Narathiwat                0.38207690115         0.7024
+Nong Bua Lamphu           0.30962665227         0.7568
+Nong Khai                 0.48472042815         0.6279
+Nonthaburi               -3.57076617157         0.0004
+Pathum Thani             -2.78339807865         0.0054
+Pattani                   0.19658983250         0.8441
+Phang Nga                 0.31952388681         0.7493
+Phatthalung               0.18161088889         0.8559
+Phayao                    0.32109875280         0.7481
+Phetchabun                0.60747438907         0.5435
+Phetchaburi              -0.17044138455         0.8647
+Phichit                   0.45645977698         0.6481
+Phitsanulok               0.62887519637         0.5294
+Phra Nakhon Si Ayutthaya  0.65251083582         0.5141
+Phrae                     0.58399346585         0.5592
+Phuket                              NaN            NaN
+Prachinburi               0.36791590620         0.7129
+Prachuap Khiri Khan      -0.10471467926         0.9166
+Ranong                   -0.10219317212         0.9186
+Ratchaburi                0.29079505125         0.7712
+Rayong                   -1.12507965880         0.2606
+Roi Et                    0.68534808378         0.4931
+Sa Kaeo                   0.43063167601         0.6667
+Sakon Nakhon              0.62522622775         0.5318
+Samut Prakan             -5.24096436405         0.0000
+Samut Sakhon             -3.50496983019         0.0005
+Samut Songkhram           0.26360257354         0.7921
+Saraburi                  0.39333654998         0.6941
+Satun                     0.16352984708         0.8701
+Sing Buri                 0.57134032448         0.5678
+Sisaket                   0.52822981910         0.5973
+Songkhla                 -0.50904291159         0.6107
+Sukhothai                 0.60658807756         0.5441
+Suphan Buri               0.54908844219         0.5829
+Surat Thani              -0.06626070868         0.9472
+Surin                     0.53451777233         0.5930
+Tak                       0.31585260712         0.7521
+Trang                     0.09226794222         0.9265
+Trat                      0.19616144815         0.8445
+Ubon Ratchathani          0.48860481380         0.6251
+Udon Thani                0.59270376863         0.5534
+Uthai Thani               0.41607023571         0.6774
+Uttaradit                 0.48853399479         0.6252
+Yala                      0.20974045792         0.8339
+Yasothon                  0.59889146247         0.5492</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>thai_tourism.localMI <span class="ot">&lt;-</span> <span class="fu">cbind</span>(thai_tourism,localMI) <span class="sc">%&gt;%</span></span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Pr.Ii =</span> Pr.z....E.Ii..)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(thai_tourism.localMI) <span class="sc">+</span></span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="at">col =</span> <span class="st">"Ii"</span>, </span>
+<span id="cb103-3"><a href="#cb103-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"pretty"</span>,</span>
+<span id="cb103-4"><a href="#cb103-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette =</span> <span class="st">"RdBu"</span>,</span>
+<span id="cb103-5"><a href="#cb103-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">title =</span> <span class="st">"local moran statistics"</span>) <span class="sc">+</span></span>
+<span id="cb103-6"><a href="#cb103-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Variable(s) "Ii" contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette.</code></pre>
+</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-71-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-76-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(thai_tourism.localMI) <span class="sc">+</span></span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="at">col =</span> <span class="st">"Pr.Ii"</span>, </span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">breaks=</span><span class="fu">c</span>(<span class="sc">-</span><span class="cn">Inf</span>, <span class="fl">0.001</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span>, <span class="fl">0.1</span>, <span class="cn">Inf</span>),</span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette=</span><span class="st">"-Blues"</span>, </span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">title =</span> <span class="st">"local Moran's I p-values"</span>) <span class="sc">+</span></span>
+<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Some legend labels were too wide. These labels have been resized to 0.61. Increase legend.width (argument of tm_layout) to make the legend wider and therefore the labels larger.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-77-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="creating-lisa-cluster-map" class="level4">
+<h4 class="anchored" data-anchor-id="creating-lisa-cluster-map">6.1.4 Creating LISA Cluster Map</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>nci <span class="ot">&lt;-</span> <span class="fu">moran.plot</span>(thai_tourism<span class="sc">$</span>revenue_all, rswm_q,</span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">labels=</span><span class="fu">as.character</span>(thai_tourism<span class="sc">$</span>province_eng), </span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">xlab=</span><span class="st">"Revenue from Tourist"</span>, </span>
+<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">ylab=</span><span class="st">"Spatially Lag Revenue from Tourist"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-78-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As seen from the scatter plot, it can be seen that Chonburi, Phuket and Bangkok is way further from the cluster</p>
+</section>
+<section id="preparing-lisa-map-classes" class="level4">
+<h4 class="anchored" data-anchor-id="preparing-lisa-map-classes">6.1.5 Preparing LISA Map Classes</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>quadrant <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="at">mode=</span><span class="st">"numeric"</span>,<span class="at">length=</span><span class="fu">nrow</span>(localMI))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>thai_tourism<span class="sc">$</span>lag_revenue <span class="ot">&lt;-</span> <span class="fu">lag.listw</span>(rswm_q, thai_tourism<span class="sc">$</span>revenue_all)</span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a>DV <span class="ot">&lt;-</span> thai_tourism<span class="sc">$</span>lag_revenue <span class="sc">-</span> <span class="fu">mean</span>(thai_tourism<span class="sc">$</span>lag_revenue)     </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Centering local Moran around the mean value</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a>LM_I <span class="ot">&lt;-</span> localMI[,<span class="dv">1</span>] <span class="sc">-</span> <span class="fu">mean</span>(localMI[,<span class="dv">1</span>])    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Set a statistical significance level</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a>signif <span class="ot">&lt;-</span> <span class="fl">0.05</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a>quadrant[DV <span class="sc">&lt;</span><span class="dv">0</span> <span class="sc">&amp;</span> LM_I<span class="sc">&lt;</span><span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="co"># low low</span></span>
+<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a>quadrant[DV <span class="sc">&gt;</span><span class="dv">0</span> <span class="sc">&amp;</span> LM_I<span class="sc">&lt;</span><span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="co"># high low</span></span>
+<span id="cb112-3"><a href="#cb112-3" aria-hidden="true" tabindex="-1"></a>quadrant[DV <span class="sc">&lt;</span><span class="dv">0</span> <span class="sc">&amp;</span> LM_I<span class="sc">&lt;</span><span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="dv">3</span> <span class="co"># low high</span></span>
+<span id="cb112-4"><a href="#cb112-4" aria-hidden="true" tabindex="-1"></a>quadrant[DV <span class="sc">&gt;</span><span class="dv">0</span> <span class="sc">&amp;</span> LM_I<span class="sc">&gt;</span><span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="dv">4</span> <span class="co"># high high</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The non significant value of Moran will be placed in category 0</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a>quadrant[localMI[,<span class="dv">5</span>]<span class="sc">&gt;</span>signif] <span class="ot">&lt;-</span> <span class="dv">0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="plotting-lisa-map" class="level4">
+<h4 class="anchored" data-anchor-id="plotting-lisa-map">6.1.6 Plotting LISA Map</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a>thai_tourism.localMI<span class="sc">$</span>quadrant <span class="ot">&lt;-</span> quadrant</span>
+<span id="cb114-2"><a href="#cb114-2" aria-hidden="true" tabindex="-1"></a>colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#ffffff"</span>, <span class="st">"#2c7bb6"</span>, <span class="st">"#abd9e9"</span>, <span class="st">"#fdae61"</span>, <span class="st">"#d7191c"</span>)</span>
+<span id="cb114-3"><a href="#cb114-3" aria-hidden="true" tabindex="-1"></a>clusters <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"insignificant"</span>, <span class="st">"low-low"</span>, <span class="st">"low-high"</span>, <span class="st">"high-low"</span>, <span class="st">"high-high"</span>)</span>
+<span id="cb114-4"><a href="#cb114-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb114-5"><a href="#cb114-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(thai_tourism.localMI) <span class="sc">+</span></span>
+<span id="cb114-6"><a href="#cb114-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="at">col =</span> <span class="st">"quadrant"</span>, </span>
+<span id="cb114-7"><a href="#cb114-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"cat"</span>, </span>
+<span id="cb114-8"><a href="#cb114-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette =</span> colors[<span class="fu">c</span>(<span class="fu">sort</span>(<span class="fu">unique</span>(quadrant)))<span class="sc">+</span><span class="dv">1</span>], </span>
+<span id="cb114-9"><a href="#cb114-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">labels =</span> clusters[<span class="fu">c</span>(<span class="fu">sort</span>(<span class="fu">unique</span>(quadrant)))<span class="sc">+</span><span class="dv">1</span>],</span>
+<span id="cb114-10"><a href="#cb114-10" aria-hidden="true" tabindex="-1"></a>          <span class="at">popup.vars =</span> <span class="fu">c</span>(<span class="st">""</span>)) <span class="sc">+</span></span>
+<span id="cb114-11"><a href="#cb114-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.zoom.limits =</span> <span class="fu">c</span>(<span class="dv">11</span>,<span class="dv">17</span>)) <span class="sc">+</span></span>
+<span id="cb114-12"><a href="#cb114-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha=</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-85-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the LISA Map, we can see that all the provinces surrounding <strong>Bangkok</strong> is a low-high autocorrelation, which means that all the surrounding provinces are low outlier, whereas Bangkok is a high outlier in terms of revenue from all tourists.</p>
+</section>
+</section>
+</section>
+<section id="hot-spot-and-cold-spot-area-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="hot-spot-and-cold-spot-area-analysis">7 Hot Spot and Cold Spot Area Analysis</h2>
+<section id="computing-local-gi-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="computing-local-gi-statistics">7.1 Computing Local Gi* Statistics</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a>wm_idw <span class="ot">&lt;-</span> thai_tourism <span class="sc">%&gt;%</span></span>
+<span id="cb115-2"><a href="#cb115-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">include_self</span>(</span>
+<span id="cb115-3"><a href="#cb115-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_contiguity</span>(geometry)),</span>
+<span id="cb115-4"><a href="#cb115-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">wts =</span> <span class="fu">st_inverse_distance</span>(nb, </span>
+<span id="cb115-5"><a href="#cb115-5" aria-hidden="true" tabindex="-1"></a>                              geometry, </span>
+<span id="cb115-6"><a href="#cb115-6" aria-hidden="true" tabindex="-1"></a>                              <span class="at">scale =</span> <span class="dv">1</span>,</span>
+<span id="cb115-7"><a href="#cb115-7" aria-hidden="true" tabindex="-1"></a>                              <span class="at">alpha =</span> <span class="dv">1</span>),</span>
+<span id="cb115-8"><a href="#cb115-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>! Polygon provided. Using point on surface.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb117"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a>HCSA <span class="ot">&lt;-</span> wm_idw <span class="sc">%&gt;%</span> </span>
+<span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">local_Gi =</span> <span class="fu">local_gstar_perm</span>(</span>
+<span id="cb117-3"><a href="#cb117-3" aria-hidden="true" tabindex="-1"></a>    revenue_all, nb, wts, <span class="at">nsim =</span> <span class="dv">99</span>),</span>
+<span id="cb117-4"><a href="#cb117-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb117-5"><a href="#cb117-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(local_Gi)</span>
+<span id="cb117-6"><a href="#cb117-6" aria-hidden="true" tabindex="-1"></a>HCSA</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 77 features and 24 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 325178.8 ymin: 620860.6 xmax: 1213656 ymax: 2263241
+Projected CRS: WGS 84 / UTM zone 47N
+# A tibble: 77 × 25
+   gi_star cluster     e_gi   var_gi std_dev p_value p_sim p_folded_sim skewness
+     &lt;dbl&gt; &lt;fct&gt;      &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;        &lt;dbl&gt;    &lt;dbl&gt;
+ 1  -0.533 High     1.25e-6 1.69e-12  -0.703 4.82e-1  0.28         0.14     1.82
+ 2   7.45  Low      1.22e-6 1.14e-11   5.28  1.31e-7  0.08         0.04     4.64
+ 3   3.49  Low      1.57e-6 8.33e-12   3.04  2.40e-3  0.12         0.06     2.91
+ 4   3.05  Low      1.38e-6 6.11e-12   3.11  1.85e-3  0.1          0.05     3.91
+ 5  -0.627 Low      1.25e-6 2.07e-12  -0.668 5.04e-1  0.3          0.15     2.32
+ 6  -0.387 Low      1.25e-6 4.45e-12  -0.407 6.84e-1  0.98         0.49     3.04
+ 7  -0.594 Low      1.03e-6 1.74e-12  -0.538 5.91e-1  0.6          0.3      2.83
+ 8  -0.549 Low      1.46e-6 5.35e-12  -0.563 5.73e-1  0.14         0.07     2.59
+ 9  -0.509 Low      1.16e-6 3.63e-12  -0.549 5.83e-1  0.16         0.08     3.05
+10  -0.395 Low      7.75e-7 1.38e-12  -0.337 7.36e-1  1            0.5      3.10
+# ℹ 67 more rows
+# ℹ 16 more variables: kurtosis &lt;dbl&gt;, nb &lt;nb&gt;, wts &lt;list&gt;, Shape_Leng &lt;dbl&gt;,
+#   Shape_Area &lt;dbl&gt;, province_eng &lt;chr&gt;, revenue_all &lt;dbl&gt;,
+#   revenue_thai &lt;dbl&gt;, revenue_foreign &lt;dbl&gt;, no_tourist_stay &lt;dbl&gt;,
+#   no_tourist_all &lt;dbl&gt;, no_tourist_thai &lt;dbl&gt;, no_tourist_foreign &lt;dbl&gt;,
+#   ratio_tourist_stay &lt;dbl&gt;, geometry &lt;MULTIPOLYGON [m]&gt;, lag_revenue &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="visualising-gi" class="level3">
+<h3 class="anchored" data-anchor-id="visualising-gi">7.2 Visualising Gi*</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>tmap mode set to plotting</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(HCSA) <span class="sc">+</span></span>
+<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"gi_star"</span>) <span class="sc">+</span> </span>
+<span id="cb121-3"><a href="#cb121-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb121-4"><a href="#cb121-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.zoom.limits =</span> <span class="fu">c</span>(<span class="dv">6</span>,<span class="dv">8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Variable(s) "gi_star" contains positive and negative values, so midpoint is set to 0. Set midpoint = NA to show the full spectrum of the color palette.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-88-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="visualising-p-value-of-hcsa" class="level3">
+<h3 class="anchored" data-anchor-id="visualising-p-value-of-hcsa">7.3 Visualising p-value of HCSA</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb123"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>tmap mode set to plotting</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb125"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb125-1"><a href="#cb125-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(HCSA) <span class="sc">+</span></span>
+<span id="cb125-2"><a href="#cb125-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"p_sim"</span>) <span class="sc">+</span> </span>
+<span id="cb125-3"><a href="#cb125-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-89-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="visualising-hot-spot-and-cold-spot-area" class="level3">
+<h3 class="anchored" data-anchor-id="visualising-hot-spot-and-cold-spot-area">7.4 Visualising Hot Spot and Cold Spot Area</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a>HCSA_sig <span class="ot">&lt;-</span> HCSA  <span class="sc">%&gt;%</span></span>
+<span id="cb126-2"><a href="#cb126-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p_sim <span class="sc">&lt;</span> <span class="fl">0.05</span>)</span>
+<span id="cb126-3"><a href="#cb126-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>tmap mode set to plotting</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(HCSA) <span class="sc">+</span></span>
+<span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span></span>
+<span id="cb128-3"><a href="#cb128-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb128-4"><a href="#cb128-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(HCSA_sig) <span class="sc">+</span></span>
+<span id="cb128-5"><a href="#cb128-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"cluster"</span>) <span class="sc">+</span> </span>
+<span id="cb128-6"><a href="#cb128-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: One tm layer group has duplicated layer types, which are omitted. To
+draw multiple layers of the same type, use multiple layer groups (i.e. specify
+tm_shape prior to each of them).</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-90-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Findings:</strong> There is no hotspot area in the plot above and there are coldspots identified in Ubon-Ratchathani, Yasothon, Roi Et and Mukdahan provinces.</p>
+</section>
+</section>
+<section id="correlation-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="correlation-analysis">8 Correlation Analysis</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb130"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a>cluster_vars.cor <span class="ot">=</span> <span class="fu">cor</span>(tourism_data[,<span class="dv">2</span><span class="sc">:</span><span class="dv">9</span>])</span>
+<span id="cb130-2"><a href="#cb130-2" aria-hidden="true" tabindex="-1"></a><span class="fu">corrplot.mixed</span>(cluster_vars.cor,</span>
+<span id="cb130-3"><a href="#cb130-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">lower =</span> <span class="st">"ellipse"</span>, </span>
+<span id="cb130-4"><a href="#cb130-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">upper =</span> <span class="st">"number"</span>,</span>
+<span id="cb130-5"><a href="#cb130-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">tl.pos =</span> <span class="st">"lt"</span>,</span>
+<span id="cb130-6"><a href="#cb130-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">diag =</span> <span class="st">"l"</span>,</span>
+<span id="cb130-7"><a href="#cb130-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">tl.col =</span> <span class="st">"black"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-91-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the correlation analysis, there is an interesting finding. Overall revenue are strongly correlated with number of foreign tourist, but it’s less stronger with the number of thai tourists. This may be due to foreign tourists contributing more revenue and spending more money as compared to local tourists.</p>
+</section>
+<section id="emerging-hotspot-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="emerging-hotspot-analysis">9 Emerging Hotspot Analysis</h2>
+<section id="creating-time-series-cube" class="level3">
+<h3 class="anchored" data-anchor-id="creating-time-series-cube">9.1 Creating Time Series Cube</h3>
+<p>Let us create a time series cube based on the revenue generated from tourism in Thailand</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb131"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb131-1"><a href="#cb131-1" aria-hidden="true" tabindex="-1"></a>tourism_revenue <span class="ot">&lt;-</span> tourism <span class="sc">%&gt;%</span></span>
+<span id="cb131-2"><a href="#cb131-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(variable <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"revenue_all"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb132"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a>tourism_revenue <span class="ot">&lt;-</span> <span class="fu">left_join</span>(boundary, tourism_revenue, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"province_eng"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Derive a dataframe grouped by the year and province in Thailand</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb133"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb133-1"><a href="#cb133-1" aria-hidden="true" tabindex="-1"></a>tourism_revenue <span class="ot">&lt;-</span> tourism_revenue <span class="sc">%&gt;%</span></span>
+<span id="cb133-2"><a href="#cb133-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, province_eng, geometry) <span class="sc">%&gt;%</span></span>
+<span id="cb133-3"><a href="#cb133-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">value =</span> <span class="fu">sum</span>(value, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb133-4"><a href="#cb133-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">variable =</span> <span class="fu">first</span>(variable))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'year', 'province_eng'. You can override
+using the `.groups` argument.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb135"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb135-1"><a href="#cb135-1" aria-hidden="true" tabindex="-1"></a>tourism_revenue <span class="ot">&lt;-</span> tourism_revenue <span class="sc">%&gt;%</span></span>
+<span id="cb135-2"><a href="#cb135-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> variable, <span class="at">values_from =</span> value)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb136"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb136-1"><a href="#cb136-1" aria-hidden="true" tabindex="-1"></a>tourism_st <span class="ot">&lt;-</span> <span class="fu">spacetime</span>(tourism_revenue, boundary,</span>
+<span id="cb136-2"><a href="#cb136-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">.loc_col =</span> <span class="st">"province_eng"</span>,</span>
+<span id="cb136-3"><a href="#cb136-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">.time_col =</span> <span class="st">"year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb137"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is_spacetime_cube</span>(tourism_st)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+</section>
+<section id="computing-gi" class="level3">
+<h3 class="anchored" data-anchor-id="computing-gi">9.2 Computing Gi*</h3>
+<section id="deriving-the-spatial-weights" class="level4">
+<h4 class="anchored" data-anchor-id="deriving-the-spatial-weights">9.2.1 Deriving the Spatial Weights</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb139"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true" tabindex="-1"></a>tourism_nb <span class="ot">&lt;-</span> tourism_st <span class="sc">%&gt;%</span></span>
+<span id="cb139-2"><a href="#cb139-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(<span class="st">"geometry"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb139-3"><a href="#cb139-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">include_self</span>(</span>
+<span id="cb139-4"><a href="#cb139-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_contiguity</span>(geometry)),</span>
+<span id="cb139-5"><a href="#cb139-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">wt =</span> <span class="fu">st_inverse_distance</span>(nb, </span>
+<span id="cb139-6"><a href="#cb139-6" aria-hidden="true" tabindex="-1"></a>                             geometry, </span>
+<span id="cb139-7"><a href="#cb139-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">scale =</span> <span class="dv">1</span>,</span>
+<span id="cb139-8"><a href="#cb139-8" aria-hidden="true" tabindex="-1"></a>                             <span class="at">alpha =</span> <span class="dv">1</span>),</span>
+<span id="cb139-9"><a href="#cb139-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb139-10"><a href="#cb139-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_nbs</span>(<span class="st">"nb"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb139-11"><a href="#cb139-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_wts</span>(<span class="st">"wt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>! Polygon provided. Using point on surface.</code></pre>
+</div>
+</div>
+</section>
+<section id="computing-gi-1" class="level4">
+<h4 class="anchored" data-anchor-id="computing-gi-1">9.2.2 Computing Gi*</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb141"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a>gi_stars <span class="ot">&lt;-</span> tourism_nb <span class="sc">%&gt;%</span> </span>
+<span id="cb141-2"><a href="#cb141-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year) <span class="sc">%&gt;%</span> </span>
+<span id="cb141-3"><a href="#cb141-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gi_star =</span> <span class="fu">local_gstar_perm</span>(</span>
+<span id="cb141-4"><a href="#cb141-4" aria-hidden="true" tabindex="-1"></a>    revenue_all, nb, wt)) <span class="sc">%&gt;%</span> </span>
+<span id="cb141-5"><a href="#cb141-5" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(gi_star)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb142"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb142-1"><a href="#cb142-1" aria-hidden="true" tabindex="-1"></a>gi_stars</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 385 features and 15 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 325178.8 ymin: 620860.6 xmax: 1213656 ymax: 2263241
+Projected CRS: WGS 84 / UTM zone 47N
+# A tibble: 385 × 16
+# Groups:   year [5]
+    year province_eng                   geometry revenue_all nb    wt    gi_star
+   &lt;dbl&gt; &lt;chr&gt;                &lt;MULTIPOLYGON [m]&gt;       &lt;dbl&gt; &lt;lis&gt; &lt;lis&gt;   &lt;dbl&gt;
+ 1  2019 Bangkok       (((674339.8 1543300, 674…     1.07e12 &lt;int&gt; &lt;dbl&gt;   5.24 
+ 2  2019 Samut Prakan  (((687139.8 1517113, 687…     7.01e 9 &lt;int&gt; &lt;dbl&gt;   3.62 
+ 3  2019 Nonthaburi    (((644817.9 1559286, 644…     4.66e 9 &lt;int&gt; &lt;dbl&gt;   2.83 
+ 4  2019 Pathum Thani  (((704086 1575736, 70408…     3.47e 9 &lt;int&gt; &lt;dbl&gt;   2.33 
+ 5  2019 Phra Nakhon … (((662941.6 1620856, 662…     1.92e10 &lt;int&gt; &lt;dbl&gt;  -0.653
+ 6  2019 Ang Thong     (((643472.8 1636469, 643…     1.01e 9 &lt;int&gt; &lt;dbl&gt;  -0.568
+ 7  2019 Lopburi       (((751293.3 1742960, 751…     5.75e 9 &lt;int&gt; &lt;dbl&gt;  -0.699
+ 8  2019 Sing Buri     (((647136.1 1668671, 647…     8.78e 8 &lt;int&gt; &lt;dbl&gt;  -0.675
+ 9  2019 Chainat       (((620165.4 1704256, 620…     1.34e 9 &lt;int&gt; &lt;dbl&gt;  -0.628
+10  2019 Saraburi      (((757935.1 1667886, 757…     6.81e 9 &lt;int&gt; &lt;dbl&gt;  -0.513
+# ℹ 375 more rows
+# ℹ 9 more variables: cluster &lt;fct&gt;, e_gi &lt;dbl&gt;, var_gi &lt;dbl&gt;, std_dev &lt;dbl&gt;,
+#   p_value &lt;dbl&gt;, p_sim &lt;dbl&gt;, p_folded_sim &lt;dbl&gt;, skewness &lt;dbl&gt;,
+#   kurtosis &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="mann-kendall-test" class="level3">
+<h3 class="anchored" data-anchor-id="mann-kendall-test">9.3 Mann-Kendall Test</h3>
+<section id="hypothesis-and-interpretation" class="level4">
+<h4 class="anchored" data-anchor-id="hypothesis-and-interpretation">9.3.1 Hypothesis and Interpretation</h4>
+<p>H0: There is no monotonic trend over time</p>
+<p>H1: Monotonic trend is present</p>
+<p>Reject null hypothesis if the p-value is smaller than alpha value</p>
+<p>Tau range interpretation:</p>
+<ul>
+<li><p>-1 = perfectly decreasing series</p></li>
+<li><p>1 = perfectly increasing series</p></li>
+</ul>
+</section>
+<section id="mann-kendall-test-on-gi" class="level4">
+<h4 class="anchored" data-anchor-id="mann-kendall-test-on-gi">9.3.2 Mann-Kendall Test on Gi</h4>
+<p>Let us choose Bangkok to analyze as Bangkok has the highest revenue from tourism</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb144"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb144-1"><a href="#cb144-1" aria-hidden="true" tabindex="-1"></a>cbg <span class="ot">&lt;-</span> gi_stars <span class="sc">%&gt;%</span> </span>
+<span id="cb144-2"><a href="#cb144-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb144-3"><a href="#cb144-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(province_eng <span class="sc">==</span> <span class="st">"Bangkok"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb144-4"><a href="#cb144-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(province_eng, year, gi_star)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb145"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> cbg, </span>
+<span id="cb145-2"><a href="#cb145-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> year, </span>
+<span id="cb145-3"><a href="#cb145-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> gi_star)) <span class="sc">+</span></span>
+<span id="cb145-4"><a href="#cb145-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb145-5"><a href="#cb145-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-102-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Findings:</strong></p>
+<ol type="1">
+<li>From 2019 to 2022, the Gi* value decreases, which indicates that there is an increasing trend towards cold spots during this period of time</li>
+<li>From 2022 to 2023, the Gi* value increases, which indicates that the spatial clustering increases towards hot spots in this period</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb146"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb146-1"><a href="#cb146-1" aria-hidden="true" tabindex="-1"></a>cbg <span class="sc">%&gt;%</span></span>
+<span id="cb146-2"><a href="#cb146-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mk =</span> <span class="fu">list</span>(</span>
+<span id="cb146-3"><a href="#cb146-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unclass</span>(</span>
+<span id="cb146-4"><a href="#cb146-4" aria-hidden="true" tabindex="-1"></a>      Kendall<span class="sc">::</span><span class="fu">MannKendall</span>(gi_star)))) <span class="sc">%&gt;%</span> </span>
+<span id="cb146-5"><a href="#cb146-5" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest_wider</span>(mk)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 6
+     tau    sl     S     D  varS                                        geometry
+   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;                              &lt;MULTIPOLYGON [m]&gt;
+1 -0.600 0.221    -6    10  16.7 (((674339.8 1543300, 674382.3 1543278, 674448.…</code></pre>
+</div>
+</div>
+<p>The p-value is 0.22, we do not reject null hypothesis and conclude that there is no monotonic trend (Bangkok)</p>
+<p>We can see the overall result per province using the following code</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb148"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb148-1"><a href="#cb148-1" aria-hidden="true" tabindex="-1"></a>ehsa <span class="ot">&lt;-</span> gi_stars <span class="sc">%&gt;%</span></span>
+<span id="cb148-2"><a href="#cb148-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(province_eng) <span class="sc">%&gt;%</span></span>
+<span id="cb148-3"><a href="#cb148-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mk =</span> <span class="fu">list</span>(</span>
+<span id="cb148-4"><a href="#cb148-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unclass</span>(</span>
+<span id="cb148-5"><a href="#cb148-5" aria-hidden="true" tabindex="-1"></a>      Kendall<span class="sc">::</span><span class="fu">MannKendall</span>(gi_star)))) <span class="sc">%&gt;%</span></span>
+<span id="cb148-6"><a href="#cb148-6" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest_wider</span>(mk)</span>
+<span id="cb148-7"><a href="#cb148-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ehsa)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 7
+  province_eng     tau    sl     S     D  varS                          geometry
+  &lt;chr&gt;          &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;                &lt;MULTIPOLYGON [m]&gt;
+1 Amnat Charoen  0     1         0    10  16.7 (((1137720 1809629, 1137724 1809…
+2 Ang Thong      0.400 0.462     4    10  16.7 (((643472.8 1636469, 643496 1636…
+3 Bangkok       -0.600 0.221    -6    10  16.7 (((674339.8 1543300, 674382.3 15…
+4 Bueng Kan      0.200 0.806     2    10  16.7 (((965496 2045531, 965625.5 2045…
+5 Buriram       -0.200 0.806    -2    10  16.7 (((921217 1750212, 921217 175021…
+6 Chachoengsao  -0.200 0.806    -2    10  16.7 (((722656.1 1546054, 722796 1546…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb150"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb150-1"><a href="#cb150-1" aria-hidden="true" tabindex="-1"></a>ehsa_desc <span class="ot">&lt;-</span> ehsa <span class="sc">%&gt;%</span></span>
+<span id="cb150-2"><a href="#cb150-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(tau))</span>
+<span id="cb150-3"><a href="#cb150-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb150-4"><a href="#cb150-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ehsa_desc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 7
+  province_eng            tau     sl     S     D  varS                  geometry
+  &lt;chr&gt;                 &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;        &lt;MULTIPOLYGON [m]&gt;
+1 Phra Nakhon Si Ayutt… 0.800 0.0864     8    10  16.7 (((662941.6 1620856, 662…
+2 Phayao                0.600 0.221      6    10  16.7 (((648755.2 2182064, 648…
+3 Uthai Thani           0.600 0.221      6    10  16.7 (((514892 1746436, 51490…
+4 Ang Thong             0.400 0.462      4    10  16.7 (((643472.8 1636469, 643…
+5 Loei                  0.400 0.462      4    10  16.7 (((827375.5 2016969, 827…
+6 Phetchabun            0.400 0.462      4    10  16.7 (((755146.4 1900816, 755…</code></pre>
+</div>
+</div>
+<p><strong>Findings:</strong> The shown sorted table is based on the Tau range, which shows that the value shown has increasing trend. The consistent growth indicates that there is potential growth in tourism revenue in these provinces.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb152"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb152-1"><a href="#cb152-1" aria-hidden="true" tabindex="-1"></a>ehsa_asc <span class="ot">&lt;-</span> ehsa <span class="sc">%&gt;%</span></span>
+<span id="cb152-2"><a href="#cb152-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(tau)</span>
+<span id="cb152-3"><a href="#cb152-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb152-4"><a href="#cb152-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ehsa_asc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 7
+  province_eng           tau     sl     S     D  varS                   geometry
+  &lt;chr&gt;                &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;         &lt;MULTIPOLYGON [m]&gt;
+1 Krabi               -0.800 0.0864    -8    10  16.7 (((512499 827838.6, 51250…
+2 Nakhon Si Thammarat -0.800 0.0864    -8    10  16.7 (((585074.4 1029631, 5850…
+3 Phang Nga           -0.800 0.0864    -8    10  16.7 (((457515.4 856050.4, 457…
+4 Trang               -0.800 0.0864    -8    10  16.7 (((552555.6 770748.6, 552…
+5 Bangkok             -0.600 0.221     -6    10  16.7 (((674339.8 1543300, 6743…
+6 Nonthaburi          -0.600 0.221     -6    10  16.7 (((644817.9 1559286, 6448…</code></pre>
+</div>
+</div>
+<p><strong>Findings:</strong> The provinces shown in above table indicates that those are the provinces with decreasing series. It is interesting to find that Bangkok is part of the top 5 decreasing series even though Bangkok has the highest revenue in tourism. This indicates that the tourism sector should pay more attention to these provinces and avoid decreasing trend.</p>
+</section>
+</section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">10 Conclusion</h2>
+<p>From the analysis, we can find that <strong>Bangkok</strong> area has a lot of tourism activity, but it doesnt show monotonic trend over time, which indicates that it is not an increasing trend and it fluctuates randomly over time. Under the hotspot and coldspot analysis, we can find that the Ubon-Ratchathani, Yasothon, Roi Et and Mukdahan provinces are considered as cold spots. This might indicate that these provinces lack of tourism infrastructure. It is a potential area for the Thailand tourism sector to pay more attention to and drive tourism traffic to the cold spots area and maintain stability of tourism activity in Bangkok area.</p>
 
 
 </section>
