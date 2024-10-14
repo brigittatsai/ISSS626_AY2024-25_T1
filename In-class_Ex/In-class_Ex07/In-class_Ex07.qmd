@@ -1,0 +1,79 @@
+---
+title: "In-class Exercise 7"
+author: "Brigitta Karen Tsai"
+date: "October 14, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+## 1 Load and Install R Packages
+
+```{r}
+pacman::p_load(olsrr, corrplot, ggpubr,
+               sf, spdep, GWmodel, tmap,
+               tidyverse, gtsummary, ggstatsplot)
+```
+
+## 2 Importing Data
+
+```{r}
+condo_resale <- read_csv("data/aspatial/Condo_resale_2015.csv")
+```
+
+```{r}
+condo_resale.sf <- st_as_sf(condo_resale,
+                            coords = c("LONGITUDE", "LATITUDE"),
+                            crs=4326) %>%
+  st_transform(crs=3414)
+```
+
+```{r}
+mpsz = st_read(dsn = "data/geospatial", layer = "MP14_SUBZONE_WEB_PL")
+```
+
+```{r}
+mpsz_svy21 <- st_transform(mpsz, 3414)
+```
+
+## 3 Correlation Analysis
+
+```{r}
+#| fig-width: 12
+#| fig-height: 10
+ggcorrmat(condo_resale[, 5:23])
+```
+
+## 4 Linear Regression Method
+
+```{r}
+condo_mlr <- lm(formula = SELLING_PRICE ~ AREA_SQM +
+                  AGE + PROX_CBD + PROX_CHILDCARE +
+                  PROX_ELDERLYCARE + PROX_URA_GROWTH_AREA +
+                  PROX_HAWKER_MARKET + PROX_KINDERGARTEN +
+                  PROX_MRT + PROX_PARK + PROX_PRIMARY_SCH +
+                  PROX_TOP_PRIMARY_SCH + PROX_SHOPPING_MALL +
+                  PROX_SUPERMARKET + PROX_BUS_STOP +
+                  NO_Of_UNITS + FAMILY_FRIENDLY +
+                  FREEHOLD + LEASEHOLD_99YR,
+                data=condo_resale.sf)
+summary(condo_mlr)
+```
+
+## 5 olsrr Method
+
+```{r}
+ols_regress(condo_mlr)
+```
+
+### 5.1 Multicolinearity
+
+```{r}
+ols_vif_tol(condo_mlr)
+```
+
+### 5.2 Variable Selection
+
