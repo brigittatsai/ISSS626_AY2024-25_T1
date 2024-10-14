@@ -15,7 +15,8 @@ execute:
 ```{r}
 pacman::p_load(olsrr, corrplot, ggpubr,
                sf, spdep, GWmodel, tmap,
-               tidyverse, gtsummary, ggstatsplot)
+               tidyverse, gtsummary, ggstatsplot,
+               sfdep)
 ```
 
 ## 2 Importing Data
@@ -77,3 +78,126 @@ ols_vif_tol(condo_mlr)
 
 ### 5.2 Variable Selection
 
+```{r}
+condo_fw_mlr <- ols_step_forward_p(
+  condo_mlr,
+  p_val = 0.05,
+  details = FALSE # TRUE = multiple iterations
+)
+```
+
+```{r}
+#| fig-width: 12
+#| fig-height: 10
+plot(condo_fw_mlr)
+```
+
+### 5.3 Test for Non-Linearity
+
+```{r}
+ols_plot_resid_fit(condo_fw_mlr$model) # no need to choose variable manually 
+```
+
+```{r}
+ols_plot_resid_hist(condo_fw_mlr$model)
+```
+
+```{r}
+ols_test_normality(condo_fw_mlr$model)
+```
+
+### 5.4 Testing for Spatial Autocorrelation
+
+```{r}
+mlr_output <- as.data.frame(condo_fw_mlr$model$residuals) %>% 
+  rename('FW_MLR_RES' = 'condo_fw_mlr$model$residuals')
+```
+
+```{r}
+condo_resale_sf <- cbind(condo_resale.sf,
+                         mlr_output$FW_MLR_RES) %>% 
+  rename('MLR_RES' = 'mlr_output.FW_MLR_RES')
+```
+
+```{r}
+tmap_mode("plot")
+tm_shape(mpsz) + 
+  tmap_options(check.and.fix = TRUE) + # to fix geometric problems
+  tm_polygons(alpha = 0.4) +
+  tm_shape(condo_resale_sf) + 
+    tm_dots(col = "MLR_RES",
+            alpha = 0.6,
+            style = "quantile")
+```
+
+```{r}
+condo_resale_sf <- condo_resale_sf %>% 
+  mutate(nb = st_knn(geometry, k = 6,
+                     longlat = FALSE),
+         wt = st_weights(nb,
+                         style = "W"),
+         .before = 1)
+```
+
+```{r}
+global_moran_perm(condo_resale_sf$MLR_RES,
+                  condo_resale_sf$nb,
+                  condo_resale_sf$wt,
+                  alternative = "two.sided",
+                  nsim = 99)
+```
+
+The global Moran's I test for residual spatial autocorrelation shows that the p-value is less than 0.00000000000000022 , which is less then the alpha of 0.05. Hence, we will reject the null hypothesis that the residuals are randomly distributed (if it's rejected, it's not random)
+
+### 5.5 Fixed Bandwidth
+
+```{r}
+bw_fixed <- bw.gwr(formula = SELLING_PRICE ~ AREA_SQM + AGE +
+                     PROX_CBD + PROX_CHILDCARE +
+                     PROX_ELDERLYCARE + PROX_URA_GROWTH_AREA +
+                     PROX_MRT + PROX_PARK + PROX_PRIMARY_SCH +
+                     PROX_SHOPPING_MALL + PROX_BUS_STOP +
+                      NO_Of_UNITS + FAMILY_FRIENDLY + FREEHOLD,
+                   data = condo_resale_sf,
+                   approach = "CV",
+                   kernel = "gaussian", # must be consistent 
+                   adaptive = FALSE,
+                   longlat = FALSE)
+```
+
+Now we use the code below to calibrate the gwr model using fixed bandwidth and gaussian kernel
+
+```{r}
+gwr_fixed <- gwr.basic(formula = SELLING_PRICE ~ AREA_SQM + AGE +
+                     PROX_CBD + PROX_CHILDCARE +
+                     PROX_ELDERLYCARE + PROX_URA_GROWTH_AREA +
+                     PROX_MRT + PROX_PARK + PROX_PRIMARY_SCH +
+                     PROX_SHOPPING_MALL + PROX_BUS_STOP +
+                      NO_Of_UNITS + FAMILY_FRIENDLY + FREEHOLD,
+                   data = condo_resale_sf,
+                   bw = bw_fixed,
+                   kernel = "gaussian", # must be consistent 
+                   adaptive = FALSE,
+                   longlat = FALSE)
+```
+
+```{r}
+gwr_fixed
+```
+
+### 5.6 Converting SDF into sf dataframe
+
+```{r}
+gwr_fixed_output <- as.data.frame(
+  gwr_fixed$SDF) %>% 
+  select(-c(2:15))
+```
+
+```{r}
+gwr_sf_fixed <- cbind(condo_resale_sf,
+                      gwr_fixed_output)
+```
+
+```{r}
+glimpse(gwr_sf_fixed)
+```
