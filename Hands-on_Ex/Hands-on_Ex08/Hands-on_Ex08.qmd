@@ -10,7 +10,7 @@ execute:
   freeze: true
 ---
 
-# Geographically Weighted Regression
+# Geographically Weighted Predictive Models
 
 **Calibrating Hedonic Pricing Model for Private Highrise Property with GWR Method**
 
@@ -19,142 +19,329 @@ execute:
 ### 1.1 Load and Install R Packages
 
 ```{r}
-pacman::p_load(olsrr, corrplot, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, gtsummary)
+pacman::p_load(sf, spdep, GWmodel, SpatialML, 
+               tmap, rsample, Metrics, tidyverse)
 ```
 
-## 2 Geospatial Data Wrangling
+## 2 Preparing Data
 
-### 2.1 Importing Geospatial Data
+### 2.1 Reading data file to rds
 
 ```{r}
-mpsz = st_read(dsn = "data/geospatial", layer = "MP14_SUBZONE_WEB_PL")
+mdata <- read_rds("data/model/mdata.rds")
 ```
 
-### 2.2 Updating CRS Information
+### 2.2 Data Sampling
 
 ```{r}
-mpsz_svy21 <- st_transform(mpsz, 3414)
-```
-
-```{r}
-st_crs(mpsz_svy21)
-```
-
-Reveal the extent of mpsz_svy21
-
-```{r}
-st_bbox(mpsz_svy21)
-```
-
-## 3 Aspatial Data Wrangling
-
-### 3.1 Importing Aspatial Data
-
-```{r}
-condo_resale = read_csv("data/aspatial/Condo_resale_2015.csv")
+set.seed(1234)
+resale_split <- initial_split(mdata, 
+                              prop = 6.5/10,)
+train_data <- training(resale_split)
+test_data <- testing(resale_split)
 ```
 
 ```{r}
-glimpse(condo_resale)
+write_rds(train_data, "data/model/train_data.rds")
+write_rds(test_data, "data/model/test_data.rds")
+```
+
+## 3 Computing Correlation Matrix
+
+```{r}
+mdata_nogeo <- mdata %>%
+  st_drop_geometry()
+corrplot::corrplot(cor(mdata_nogeo[, 2:17]), 
+                   diag = FALSE, 
+                   order = "AOE",
+                   tl.pos = "td", 
+                   tl.cex = 0.5, 
+                   method = "number", 
+                   type = "upper")
+```
+
+## 4 Retriving the Stored Data
+
+```{r}
+train_data <- read_rds("data/model/train_data.rds")
+test_data <- read_rds("data/model/test_data.rds")
+```
+
+## 5 Building a non-spatial multiple linear regression
+
+```{r}
+price_mlr <- lm(resale_price ~ floor_area_sqm +
+                  storey_order + remaining_lease_mths +
+                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+                  PROX_MRT + PROX_PARK + PROX_MALL + 
+                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                  WITHIN_1KM_PRISCH,
+                data=train_data)
+summary(price_mlr)
 ```
 
 ```{r}
-head(condo_resale$LONGITUDE) #see the data in XCOORD column
+write_rds(price_mlr, "data/model/price_mlr.rds" ) 
+```
+
+## 6 gwr Predictive Method
+
+### 6.1 Converting sf dataframe to Spatial Point dataframe
+
+```{r}
+train_data_sp <- as_Spatial(train_data)
+train_data_sp
+```
+
+### 6.2 Computing Adaptive Bandwidth
+
+```{r}
+#| eval: FALSE
+bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
+                  storey_order + remaining_lease_mths +
+                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+                  PROX_MRT + PROX_PARK + PROX_MALL + 
+                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                  WITHIN_1KM_PRISCH,
+                  data=train_data_sp,
+                  approach="CV",
+                  kernel="gaussian",
+                  adaptive=TRUE,
+                  longlat=FALSE)
+```
+
+The result shows that 40 neighbour points will be the optimal bandwidth to be used if adaptive bandwidth is used for this data set.
+
+```{r}
+#| eval: FALSE
+write_rds(bw_adaptive, "data/model/bw_adaptive.rds")
+```
+
+### 6.3 Constructing Adaptive Bandwidth gwr Model
+
+```{r}
+#| eval: FALSE
+bw_adaptive <- read_rds("data/model/bw_adaptive.rds")
 ```
 
 ```{r}
-head(condo_resale$LATITUDE) #see the data in YCOORD column
+#| eval: FALSE
+gwr_adaptive <- gwr.basic(formula = resale_price ~
+                            floor_area_sqm + storey_order +
+                            remaining_lease_mths + PROX_CBD + 
+                            PROX_ELDERLYCARE + PROX_HAWKER +
+                            PROX_MRT + PROX_PARK + PROX_MALL + 
+                            PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                            WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                            WITHIN_1KM_PRISCH,
+                          data=train_data_sp,
+                          bw=bw_adaptive, 
+                          kernel = 'gaussian', 
+                          adaptive=TRUE,
+                          longlat = FALSE)
 ```
 
 ```{r}
-summary(condo_resale)
+#| eval: FALSE
+write_rds(gwr_adaptive, "data/model/gwr_adaptive.rds")
 ```
 
-### 3.2 Converting Aspatial Dataframe into sf Object
+### 6.4 Retrieve gwr Output Object
 
 ```{r}
-condo_resale.sf <- st_as_sf(condo_resale,
-                            coords = c("LONGITUDE", "LATITUDE"),
-                            crs=4326) %>%
-  st_transform(crs=3414)
-```
-
-```{r}
-head(condo_resale.sf)
-```
-
-## 4 Exploratory Data Analysis
-
-### 4.1 EDA using Statistical Graphics
-
-```{r}
-ggplot(data=condo_resale.sf, aes(x=`SELLING_PRICE`)) +
-  geom_histogram(bins=20, color="black", fill="light blue")
-```
-
-The figure above reveals a right skewed distribution. This means that more condominium units were transacted at relative lower price
-
-Normalise skewed distribution using log transformation
-
-```{r}
-condo_resale.sf <- condo_resale.sf %>%
-  mutate(`LOG_SELLING_PRICE` = log(SELLING_PRICE))
+#| eval: FALSE
+gwr_adaptive <- read_rds("data/model/gwr_adaptive.rds")
 ```
 
 ```{r}
-ggplot(data=condo_resale.sf, aes(x=`LOG_SELLING_PRICE`)) +
-  geom_histogram(bins=20, color="black", fill="light blue")
+#| eval: FALSE
+gwr_adaptive
 ```
 
-### 4.2 Multiple Histogram Plots Distribution of Variables
+### 6.5 Converting test data from sf dataframe to Spatial Point dataframe
 
 ```{r}
-AREA_SQM <- ggplot(data=condo_resale.sf, aes(x= `AREA_SQM`)) + 
-  geom_histogram(bins=20, color="black", fill="light blue")
-
-AGE <- ggplot(data=condo_resale.sf, aes(x= `AGE`)) +
-  geom_histogram(bins=20, color="black", fill="light blue")
-
-PROX_CBD <- ggplot(data=condo_resale.sf, aes(x= `PROX_CBD`)) +
-  geom_histogram(bins=20, color="black", fill="light blue")
-
-PROX_CHILDCARE <- ggplot(data=condo_resale.sf, aes(x= `PROX_CHILDCARE`)) + 
-  geom_histogram(bins=20, color="black", fill="light blue")
-
-PROX_ELDERLYCARE <- ggplot(data=condo_resale.sf, aes(x= `PROX_ELDERLYCARE`)) +
-  geom_histogram(bins=20, color="black", fill="light blue")
-
-PROX_URA_GROWTH_AREA <- ggplot(data=condo_resale.sf, 
-                               aes(x= `PROX_URA_GROWTH_AREA`)) +
-  geom_histogram(bins=20, color="black", fill="light blue")
-
-PROX_HAWKER_MARKET <- ggplot(data=condo_resale.sf, aes(x= `PROX_HAWKER_MARKET`)) +
-  geom_histogram(bins=20, color="black", fill="light blue")
-
-PROX_KINDERGARTEN <- ggplot(data=condo_resale.sf, aes(x= `PROX_KINDERGARTEN`)) +
-  geom_histogram(bins=20, color="black", fill="light blue")
-
-PROX_MRT <- ggplot(data=condo_resale.sf, aes(x= `PROX_MRT`)) +
-  geom_histogram(bins=20, color="black", fill="light blue")
-
-PROX_PARK <- ggplot(data=condo_resale.sf, aes(x= `PROX_PARK`)) +
-  geom_histogram(bins=20, color="black", fill="light blue")
-
-PROX_PRIMARY_SCH <- ggplot(data=condo_resale.sf, aes(x= `PROX_PRIMARY_SCH`)) +
-  geom_histogram(bins=20, color="black", fill="light blue")
-
-PROX_TOP_PRIMARY_SCH <- ggplot(data=condo_resale.sf, 
-                               aes(x= `PROX_TOP_PRIMARY_SCH`)) +
-  geom_histogram(bins=20, color="black", fill="light blue")
-
-ggarrange(AREA_SQM, AGE, PROX_CBD, PROX_CHILDCARE, PROX_ELDERLYCARE, 
-          PROX_URA_GROWTH_AREA, PROX_HAWKER_MARKET, PROX_KINDERGARTEN, PROX_MRT,
-          PROX_PARK, PROX_PRIMARY_SCH, PROX_TOP_PRIMARY_SCH,  
-          ncol = 3, nrow = 4)
+test_data_sp <- test_data %>%
+  as_Spatial()
+test_data_sp
 ```
 
-### 4.3 Drawing Statistical Point Map
+### 6.6 Computing Adaptive Bandwidth for the test data
 
 ```{r}
-tmap_mode("view")
+#| eval: FALSE
+gwr_bw_test_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
+                  storey_order + remaining_lease_mths +
+                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+                  PROX_MRT + PROX_PARK + PROX_MALL + 
+                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                  WITHIN_1KM_PRISCH,
+                  data=test_data_sp,
+                  approach="CV",
+                  kernel="gaussian",
+                  adaptive=TRUE,
+                  longlat=FALSE)
+```
+
+### 6.7 Computing Predicted Values of the test data
+
+```{r}
+#| eval: FALSE
+gwr_pred <- gwr.predict(formula = resale_price ~
+                          floor_area_sqm + storey_order +
+                          remaining_lease_mths + PROX_CBD + 
+                          PROX_ELDERLYCARE + PROX_HAWKER + 
+                          PROX_MRT + PROX_PARK + PROX_MALL + 
+                          PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                          WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
+                          WITHIN_1KM_PRISCH, 
+                        data=train_data_sp, 
+                        predictdata = test_data_sp, 
+                        bw=40, 
+                        kernel = 'gaussian', 
+                        adaptive=TRUE, 
+                        longlat = FALSE)
+```
+
+## 7 Preparing Coordinates data
+
+### 7.1 Extracting Coordinates Data
+
+```{r}
+coords <- st_coordinates(mdata)
+coords_train <- st_coordinates(train_data)
+coords_test <- st_coordinates(test_data)
+```
+
+```{r}
+coords_train <- write_rds(coords_train, "data/model/coords_train.rds" )
+coords_test <- write_rds(coords_test, "data/model/coords_test.rds" )
+```
+
+### 7.2 Dropping Geometry Field
+
+```{r}
+train_data <- train_data %>% 
+  st_drop_geometry()
+```
+
+## 8 Calibrating Random Forest Model
+
+```{r}
+set.seed(1234)
+rf <- ranger(resale_price ~ floor_area_sqm + storey_order + 
+               remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + 
+               PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL + 
+               PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+               WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
+               WITHIN_1KM_PRISCH,
+             data=train_data)
+rf
+```
+
+```{r}
+write_rds(rf, "data/model/rf.rds")
+```
+
+```{r}
+rf <- read_rds("data/model/rf.rds")
+rf
+```
+
+## 9 Calibrating Geographical Random Forest Model
+
+### 9.1 Calibrating using Training Data
+
+```{r}
+#| eval: FALSE
+set.seed(1234)
+gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm + storey_order +
+                       remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE +
+                       PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL +
+                       PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                       WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                       WITHIN_1KM_PRISCH,
+                     dframe=train_data, 
+                     bw=55,
+                     kernel="adaptive",
+                     coords=coords_train)
+```
+
+```{r}
+#| eval: FALSE
+write_rds(gwRF_adaptive, "data/model/gwRF_adaptive.rds")
+```
+
+```{r}
+#| eval: FALSE
+gwRF_adaptive <- read_rds("data/model/gwRF_adaptive.rds")
+```
+
+### 9.2 Predicting using Test Data
+
+#### 9.2.1 Preparing Test Data
+
+```{r}
+test_data <- cbind(test_data, coords_test) %>%
+  st_drop_geometry()
+```
+
+#### 9.2.2 Predicting with Test Data
+
+```{r}
+#| eval: FALSE
+gwRF_pred <- predict.grf(gwRF_adaptive, 
+                           test_data, 
+                           x.var.name="X",
+                           y.var.name="Y", 
+                           local.w=1,
+                           global.w=0)
+```
+
+```{r}
+#| eval: FALSE
+GRF_pred <- write_rds(gwRF_pred, "data/model/GRF_pred.rds")
+```
+
+#### 9.2.3 Converting Predicted Output into a dataframe
+
+```{r}
+#| eval: FALSE
+GRF_pred <- read_rds("data/model/GRF_pred.rds")
+GRF_pred_df <- as.data.frame(GRF_pred)
+```
+
+cbind() is used to append predicted values onto test data
+
+```{r}
+#| eval: FALSE
+test_data_p <- cbind(test_data, GRF_pred_df)
+```
+
+```{r}
+#| eval: FALSE
+write_rds(test_data_p, "data/model/test_data_p.rds")
+```
+
+### 9.3 Calculating Root Mean Square Error (RMSE)
+
+```{r}
+#| eval: FALSE
+rmse(test_data_p$resale_price, 
+     test_data_p$GRF_pred)
+```
+
+### 9.4 Visualising the Predicted Values
+
+Alternatively, scatterplot can be used to visualise the actual resale price and the predicted resale price by using the code chunk below.
+
+```{r}
+#| eval: FALSE
+ggplot(data = test_data_p,
+       aes(x = GRF_pred,
+           y = resale_price)) +
+  geom_point()
 ```
