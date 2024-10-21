@@ -11,7 +11,11 @@ execute:
 ---
 
 ```{r}
-pacman::p_load(tidyverse, sf, httr, jsonlite, rvest)
+pacman::p_load(tidyverse, sf, httr, jsonlite, rvest,
+               tidymodels, knitr, kableExtra,
+               olsrr, corrplot, ggpubr,
+               sf, spdep, GWmodel, tmap,
+               gtsummary, ggstatsplot, sfdep)
 ```
 
 ```{r}
@@ -115,4 +119,73 @@ coords <- get_coords(add_list)
 
 ```{r}
 write_rds(coords, "data/HDB/rds/coords.rds")
+```
+
+## 2 Preparing Data
+
+```{r}
+mdata <- read_rds("data/model/mdata.rds")
+```
+
+## 3 Data Sampling
+
+```{r}
+set.seed(1234)
+resale_split <- initial_split(mdata,
+                              prop = 6.5/10)
+
+train_data <- training(resale_split)
+test_data <- testing(resale_split)
+```
+
+## 4 Multicollinearity Check
+
+```{r}
+mdata_nogeo <- mdata %>% 
+  st_drop_geometry()
+ggstatsplot::ggcorrmat(mdata_nogeo[,2:17])
+```
+
+## 5 Building a non-spatial multiple linear regression
+
+```{r}
+price_mlr <- lm(resale_price ~ floor_area_sqm +
+                  storey_order + remaining_lease_mths +
+                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+                  PROX_MRT + PROX_PARK + PROX_MALL +
+                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                  WITHIN_1KM_PRISCH,
+                data = train_data)
+olsrr::ols_regress(price_mlr)
+```
+
+```{r}
+vif <- performance::check_collinearity(price_mlr)
+kable(vif,
+      caption = "Variance Inflation Factor (VIF) Results") %>% 
+  kable_styling(font_size = 18)
+```
+
+```{r}
+#| eval: FALSE
+plot(vif) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## 6 Predictive Modelling with MLR
+
+```{r}
+bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
+                  storey_order + remaining_lease_mths +
+                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+                  PROX_MRT + PROX_PARK + PROX_MALL + 
+                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                  WITHIN_1KM_PRISCH,
+                  data=train_data,
+                  approach="CV",
+                  kernel="gaussian",
+                  adaptive=TRUE,
+                  longlat=FALSE)
 ```
