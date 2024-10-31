@@ -1,0 +1,31 @@
+---
+title: "Hands-on Exercise 10"
+author: "Brigitta Karen Tsai"
+date: "October 31, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+# Spatial Interaction Models
+
+# 10A: Processing and Visualising Flow Data
+
+## 1 Getting Started
+
+```{r}
+pacman::p_load(tmap, sf, DT, stplanr, tidyverse)
+```
+
+## 2 Preparing the Flow Data
+
+### 2.1 Importing OD Data
+
+Import Passenger Volume by Origin Destination Bus Stops
+
+```{r}
+odbus <- read_csv("data/aspatial/origin_destination_bus_202210.csv")
+```

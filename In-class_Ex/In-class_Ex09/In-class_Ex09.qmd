@@ -1,0 +1,175 @@
+---
+title: "In-class Exercise 9"
+author: "Brigitta Karen Tsai"
+date: "October 29, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  message: false
+  freeze: true
+---
+
+## 1 Getting Started
+
+### 1.1 Load and Install R Packages
+
+```{r}
+pacman::p_load(SpatialAcc, sf, tidyverse, 
+               tmap, ggstatsplot)
+```
+
+### 1.2 Importing Data to R Environment
+
+```{r}
+eldercare <- st_read(dsn = "data/rawdata",
+                     layer = "ELDERCARE") %>%
+  st_transform(crs = 3414)
+```
+
+```{r}
+CHAS <- st_read("data/rawdata/CHASClinics.kml") %>%
+  st_transform(crs = 3414)
+```
+
+```{r}
+hexagons <- st_read(dsn = "data/rawdata", layer = "hexagons") 
+```
+
+```{r}
+ODMatrix <- read_csv("data/rawdata/OD_Matrix.csv", skip = 0)
+```
+
+```{r}
+mpsz <- st_read(dsn = "data/rawdata", layer = "MP14_SUBZONE_NO_SEA_PL")
+```
+
+```{r}
+mpsz <- st_transform(mpsz, 3414)
+```
+
+##  2 Count Number of Points within a Distance
+
+### 2.1 Buffering
+
+```{r}
+buffer_1km <- st_buffer(eldercare, 
+                        dist = 1000)
+```
+
+### 2.2 Visualising
+
+```{r}
+tmap_mode("view")
+tm_shape(buffer_1km) +
+  tm_polygons() +
+tm_shape(CHAS) +
+  tm_dots()
+```
+
+### 2.3 Counting Points
+
+```{r}
+buffer_1km$pts_count <- lengths(
+  st_intersects(buffer_1km, CHAS))
+```
+
+## 3 Data Cleaning and Updating Attributes
+
+### 3.1 Supply
+
+```{r}
+eldercare <- eldercare %>%
+  select(fid, ADDRESSPOS) %>%
+  mutate(capacity = 100)
+```
+
+### 3.2 Demand
+
+```{r}
+hexagons <- hexagons %>%
+  select(fid) %>%
+  mutate(demand = 100)
+```
+
+### 3.3 OD Matrix
+
+```{r}
+distmat <- ODMatrix %>%
+  select(origin_id, destination_id, total_cost) %>%
+  spread(destination_id, total_cost)%>%
+  select(c(-c('origin_id')))
+```
+
+```{r}
+distmat_km <- as.matrix(distmat/1000)
+```
+
+## 4 Computing Hansen's Accessibility
+
+### 4.1 Computing Accessibility
+
+Base Code:
+
+```{r}
+acc_Hansen <- data.frame(ac(hexagons$demand,
+                            eldercare$capacity,
+                            distmat_km, 
+                            #d0 = 50,
+                            power = 2, 
+                            family = "Hansen"))
+```
+
+Tidy the output:
+
+```{r}
+colnames(acc_Hansen) <- "accHansen"
+
+acc_Hansen <- as_tibble(acc_Hansen)
+
+hexagon_Hansen <- bind_cols(hexagons, acc_Hansen)
+```
+
+### 4.2 Visualising Accessibility
+
+```{r}
+mapex <- st_bbox(hexagons)
+
+tmap_mode("plot")
+tm_shape(hexagon_Hansen,
+         bbox = mapex) + 
+  tm_fill(col = "accHansen",
+          n = 10,
+          style = "quantile",
+          border.col = "black",
+          border.lwd = 1) +
+tm_shape(eldercare) +
+  tm_symbols(size = 0.1) +
+  tm_layout(main.title = "Accessibility to eldercare: Hansen method",
+            main.title.position = "center",
+            main.title.size = 2,
+            legend.outside = FALSE,
+            legend.height = 0.45, 
+            legend.width = 3.0,
+            legend.format = list(digits = 6),
+            legend.position = c("right", "top"),
+            frame = TRUE) +
+  tm_compass(type="8star", size = 2) +
+  tm_scale_bar(width = 0.15) +
+  tm_grid(lwd = 0.1, alpha = 0.5)
+```
+
+### 4.3 Statistical Graphic
+
+```{r}
+hexagon_Hansen <- st_join(hexagon_Hansen, mpsz, 
+                          join = st_intersects)
+```
+
+```{r}
+ggbetweenstats(
+  data = hexagon_Hansen,
+  x = REGION_N,
+  y = accHansen,
+  type = "p")
+```

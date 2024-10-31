@@ -1,0 +1,15 @@
+{
+  "hash": "a4240fbcf36b71bab01018f377a8a919",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Hands-on Exercise 10\"\nauthor: \"Brigitta Karen Tsai\"\ndate: \"October 31, 2024\"\ndate-modified: \"last-modified\"\nexecute: \n  eval: true\n  echo: true\n  message: false\n  freeze: true\n---\n\n\n# Spatial Interaction Models\n\n# 10A: Processing and Visualising Flow Data\n\n## 1 Getting Started\n\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(tmap, sf, DT, stplanr, tidyverse)\n```\n:::\n\n\n## 2 Preparing the Flow Data\n\n### 2.1 Importing OD Data\n\nImport Passenger Volume by Origin Destination Bus Stops\n\n\n::: {.cell}\n\n```{.r .cell-code}\nodbus <- read_csv(\"data/aspatial/origin_destination_bus_202210.csv\")\n```\n\n::: {.cell-output .cell-output-stderr}\n\n```\nRows: 5122925 Columns: 7\n── Column specification ────────────────────────────────────────────────────────\nDelimiter: \",\"\nchr (3): YEAR_MONTH, DAY_TYPE, PT_TYPE\ndbl (4): TIME_PER_HOUR, ORIGIN_PT_CODE, DESTINATION_PT_CODE, TOTAL_TRIPS\n\nℹ Use `spec()` to retrieve the full column specification for this data.\nℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.\n```\n\n\n:::\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
