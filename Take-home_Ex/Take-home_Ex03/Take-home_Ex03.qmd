@@ -9,3 +9,744 @@ execute:
   message: false
   freeze: true
 ---
+
+# Modelling Geography of Financial Inclusion in Tanzania
+
+# 1 Objectives
+
+The objectives of this analysis is to build an explanatory model to determine the **factors affecting financial inclusion** by using **geographical weighted regression** methods.
+
+Financial inclusion is the availability and equality of opportunities to access financial services, which include **banking, loan, equity and insurance products**.
+
+# 2 Getting Started
+
+## 2.1 Install and Load R Packages
+
+```{r}
+pacman::p_load(olsrr, corrplot, ggpubr, sf, sfdep, spdep, GWmodel, tmap, tidyverse, gtsummary)
+```
+
+## 2.2 Importing Geospatial Data
+
+```{r}
+district_tz = st_read(dsn = "data/rawdata/geospatial", layer = "geoBoundaries-TZA-ADM2")
+```
+
+## 2.3 Importing Aspatial Data
+
+```{r}
+tanzania = read_csv("data/rawdata/aspatial/tanzania.csv")
+```
+
+# 3 Data Wrangling
+
+## 3.1 Aspatial Data Wrangling
+
+### 3.1.1 Check Districts in Both Dataset
+
+```{r}
+unique(tanzania$dist_name)
+```
+
+```{r}
+unique(district_tz$shapeName)
+```
+
+```{r}
+length(intersect(tanzania$dist_name, district_tz$shapeName))
+```
+
+Check if there is any duplicated survey respondent
+
+```{r}
+tanzania$SN[duplicated(tanzania$SN)]
+```
+
+There is 0 duplicates in the Serial Number column.
+
+### 3.1.2 Selecting Variables
+
+The current Tanzania dataset consists of 721 column. Let us select out the variables that we are interested in for our analysis
+
+```{r}
+tz <- tanzania %>%
+  select(
+    dist_name, clustertype,
+    c8c, c9, c11, e_5_2,
+    c23__1, c23__2, c23__3, BANKED, ins2,
+    mob2, c27__9, c27__10, c27__14,
+    D6_4a, e_3_3__4, e_3_3__5, e_3_3__6, e_3_3__7,
+    e_3_3__11, e_3_3__12, e_3_3__13, e_4,
+    f_3_2_1__1, f_3_2_1__2, f_3_2_1__3, f_3_2_1__4,
+    g_1_2_1__1, g_1_2_1__2, g_1_2_1__3, g_1_2_1__9, g_1_2_1__5,
+    Household_weight, population_wt
+  )
+```
+
+### 3.1.3 Rename Columns
+
+```{r}
+tz <- tz %>%
+  rename(
+    age = c8c,
+    gender = c9,
+    edu = c11,
+    fin_edu = e_5_2,
+    mm_access = c23__1,
+    int_access = c23__2,
+    laptop_access = c23__3,
+    bank = BANKED,
+    insurance = ins2,
+    mm = mob2,
+    pb_doc = c27__9,
+    bank_doc = c27__10,
+    insurance_doc = c27__14,
+    biz_registered = D6_4a,
+    bank_advice = e_3_3__4,
+    mfi_advice = e_3_3__5,
+    sacco_advice = e_3_3__6,
+    fin_advice = e_3_3__7,
+    sg_advice = e_3_3__11,
+    ml_advice = e_3_3__12,
+    gov_advice = e_3_3__13,
+    budget = e_4,
+    bank_save = f_3_2_1__1,
+    mfi_save = f_3_2_1__2, 
+    sacco_save = f_3_2_1__3, 
+    mm_save = f_3_2_1__4, 
+    bank_borrow = g_1_2_1__1,
+    mfi_borrow = g_1_2_1__2,
+    sacco_borrow = g_1_2_1__3,
+    gov_borrow = g_1_2_1__9,
+    mm_borrow = g_1_2_1__5, 
+    hh_wt = Household_weight,
+    pop_wt = population_wt
+  )
+```
+
+### 3.1.4 Check Missing Value
+
+```{r}
+sum(is.na(tz$biz_registered))
+```
+
+Missing values are non-business owners, let us fill in the missing values
+
+```{r}
+tz$biz_registered[is.na(tz$biz_registered)] <- "no biz"
+```
+
+Remove rows with missing values
+
+```{r}
+tz <- tz %>% filter(!is.na(bank_borrow))
+```
+
+```{r}
+tz <- tz %>% filter(!is.na(int_access))
+```
+
+```{r}
+tz <- tz %>% filter(!is.na(laptop_access))
+```
+
+```{r}
+tz_gwr <- tz %>%
+  group_by(dist_name) %>%
+  summarize(
+    urban_pct = mean(clustertype == "Urban") * 100,
+    rural_pct = mean(clustertype == "Rural") * 100,
+    female_pct = mean(gender == "Female") * 100,
+    male_pct = mean(gender == "Male") * 100,
+    no_edu_pct = mean(edu == "No formal education") * 100,
+    no_fin_edu_pct = mean(fin_edu == "FALSE") * 100,
+    no_mm_access_pct = mean(mm_access == "No") * 100,
+    no_int_access_pct = mean(int_access == "No") * 100,
+    no_laptop_access_pct = mean(laptop_access == "No") * 100,
+    no_bank_pct = mean(bank == "Not Banked") * 100,
+    no_insurance_pct = mean(insurance == "No") * 100,
+    no_mm_pct = mean(mm == "No") * 100,
+    no_pb_doc_pct = mean(pb_doc == "No") * 100,
+    no_bank_doc_pct = mean(bank_doc == "No") * 100,
+    no_insurance_doc_pct = mean(insurance_doc == "No") * 100,
+    no_biz_register_pct = mean(biz_registered == "No") * 100,
+    no_bank_advice_pct = mean(bank_advice == "No") * 100,
+    no_mfi_advice_pct = mean(mfi_advice == "No") * 100,
+    no_sacco_advice_pct = mean(sacco_advice == "No") * 100,
+    no_fin_advice_pct = mean(fin_advice == "No") * 100,
+    no_sg_advice_pct = mean(sg_advice == "No") * 100,
+    no_ml_advice_pct = mean(ml_advice == "No") * 100,
+    no_gov_advice_pct = mean(gov_advice == "No") * 100,
+    no_budget_pct = mean(budget == "No, I don’t agree") * 100,
+    no_bank_save_pct = mean(bank_save == "No") * 100,
+    no_mfi_save_pct = mean(mfi_save == "No") * 100,
+    no_sacco_save_pct = mean(sacco_save == "No") * 100,
+    no_mm_save_pct = mean(mm_save == "No") * 100,
+    no_bank_borrow_pct = mean(bank_borrow == "No") * 100,
+    no_mfi_borrow_pct = mean(mfi_borrow == "No") * 100,
+    no_sacco_borrow_pct = mean(sacco_borrow == "No") * 100,
+    no_gov_borrow_pct = mean(gov_borrow == "No") * 100,
+    no_mm_borrow_pct = mean(mm_borrow == "No") * 100,
+    avg_hh_wt = mean(hh_wt, na.rm = TRUE),
+    avg_pop_wt = mean(pop_wt, na.rm = TRUE)
+  )
+```
+
+## 3.2 Geospatial Data Wrangling
+
+### 3.2.1 Updating CRS Information
+
+```{r}
+st_crs(district_tz)
+```
+
+```{r}
+district_tz <- st_transform(district_tz, 4210)
+```
+
+```{r}
+st_crs(district_tz)
+```
+
+### 3.2.2 Convert Multipolygon into Individual Polygons
+
+Calculate the area of each polygon
+
+```{r}
+sf_polygon <- district_tz %>% 
+  st_cast("POLYGON") %>% 
+  mutate(area = st_area(.))
+```
+
+### 3.2.3 Group by the unique name and select largest polygon by area
+
+```{r}
+dist_tz <- sf_polygon %>% 
+  group_by(shapeName) %>% 
+  filter(area == max(area)) %>% 
+  ungroup() %>% 
+  select(-area) %>% 
+  select(shapeName)
+```
+
+## 3.3 Join Table
+
+### 3.3.1 Perform Left Join
+
+```{r}
+tz_gwr <- tz_gwr %>%
+  left_join(dist_tz, by = c("dist_name" = "shapeName"))
+```
+
+### 3.3.2 Check for Empty Polygons
+
+```{r}
+sum(st_is_empty(tz_gwr$geometry))
+```
+
+There are 12 empty polygons, let's drop the districts with no information
+
+```{r}
+tz_gwr <- tz_gwr %>%
+  filter(!st_is_empty(geometry))
+```
+
+### 3.3.3 Convert aspatial dataframe into sf object
+
+```{r}
+tz_sf <- st_as_sf(tz_gwr)
+```
+
+```{r}
+st_crs(tz_sf)
+```
+
+### 3.3.4 Drop Districts
+
+Drop districts that is unavailable in either of both datasets
+
+```{r}
+dist_tz <- dist_tz %>%
+  filter(shapeName %in% tz_gwr$dist_name)
+```
+
+# 4 Exploratory Data Analysis
+
+## 4.1 EDA using statistical graphs
+
+Let us check whether Tanzania consist of mostly urban or rural area
+
+```{r}
+ggplot(data=tz_gwr, aes(x=`rural_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+```
+
+We can see that the graph is skewed to the left and majority of the area are rural areas
+
+Let us roughly find out percentage of people in Tanzania who has received financial education in their life
+
+```{r}
+ggplot(data=tz_gwr, aes(x=`no_fin_edu_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+```
+
+It turns out the data is also left-skewed, which means there are still a lot of people lacking with financial education in their life.
+
+Let us plot all the EDAs to figure out the level of accessibility to financial services in Tanzania
+
+```{r}
+NO_MM_ACCESS_PCT <- ggplot(data=tz_gwr, aes(x= `no_mm_access_pct`)) + 
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_INT_ACCESS_PCT <- ggplot(data=tz_gwr, aes(x= `no_int_access_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_LAPTOP_ACCESS_PCT <- ggplot(data=tz_gwr, aes(x= `no_laptop_access_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_BANK_PCT <- ggplot(data=tz_gwr, aes(x= `no_bank_pct`)) + 
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_INSURANCE_PCT <- ggplot(data=tz_gwr, aes(x= `no_insurance_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_MM_PCT <- ggplot(data=tz_gwr, 
+                    aes(x= `no_mm_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_PB_DOC_PCT <- ggplot(data=tz_gwr, aes(x= `no_pb_doc_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_BANK_DOC_PCT <- ggplot(data=tz_gwr, aes(x= `no_bank_doc_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_INSURANCE_DOC_PCT <- ggplot(data=tz_gwr, aes(x= `no_insurance_doc_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_BIZ_REGISTER_PCT <- ggplot(data=tz_gwr, aes(x= `no_biz_register_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_BANK_ADVICE_PCT <- ggplot(data=tz_gwr, aes(x= `no_bank_advice_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_MFI_ADVICE_PCT <- ggplot(data=tz_gwr, aes(x= `no_mfi_advice_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+ggarrange(NO_MM_ACCESS_PCT, NO_INT_ACCESS_PCT, NO_LAPTOP_ACCESS_PCT, NO_BANK_PCT, NO_INSURANCE_PCT, 
+          NO_MM_PCT, NO_PB_DOC_PCT, NO_BANK_DOC_PCT, NO_INSURANCE_DOC_PCT, NO_BIZ_REGISTER_PCT, 
+          NO_BANK_ADVICE_PCT, NO_MFI_ADVICE_PCT,  
+          ncol = 3, nrow = 4)
+```
+
+As you can see from the graphs, people rarely have access to banks or microfinancial institutions or other financial institutions to gain financial advice.
+
+```{r}
+NO_SACCO_ADVICE_PCT <- ggplot(data=tz_gwr, aes(x= `no_sacco_advice_pct`)) + 
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_FIN_ADVICE_PCT <- ggplot(data=tz_gwr, aes(x= `no_fin_advice_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_SG_ADVICE_PCT <- ggplot(data=tz_gwr, aes(x= `no_sg_advice_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_ML_ADVICE_PCT <- ggplot(data=tz_gwr, aes(x= `no_ml_advice_pct`)) + 
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_GOV_ADVICE_PCT <- ggplot(data=tz_gwr, aes(x= `no_gov_advice_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_BUDGET_PCT <- ggplot(data=tz_gwr, aes(x= `no_budget_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_BANK_SAVE_PCT <- ggplot(data=tz_gwr, 
+                    aes(x= `no_bank_save_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_MFI_SAVE_PCT <- ggplot(data=tz_gwr, aes(x= `no_mfi_save_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_SACCO_SAVE_PCT <- ggplot(data=tz_gwr, aes(x= `no_sacco_save_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_MM_SAVE_PCT <- ggplot(data=tz_gwr, aes(x= `no_mm_save_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_BANK_BORROW_PCT <- ggplot(data=tz_gwr, aes(x= `no_bank_borrow_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_MFI_BORROW_PCT <- ggplot(data=tz_gwr, aes(x= `no_mfi_borrow_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_SACCO_BORROW_PCT <- ggplot(data=tz_gwr, aes(x= `no_sacco_borrow_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_GOV_BORROW_PCT <- ggplot(data=tz_gwr, aes(x= `no_gov_borrow_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+NO_MM_BORROW_PCT <- ggplot(data=tz_gwr, aes(x= `no_mm_borrow_pct`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+ggarrange(NO_SACCO_ADVICE_PCT, NO_FIN_ADVICE_PCT, NO_SG_ADVICE_PCT, NO_ML_ADVICE_PCT, NO_GOV_ADVICE_PCT, 
+          NO_BUDGET_PCT, NO_BANK_SAVE_PCT, NO_MFI_SAVE_PCT, NO_SACCO_SAVE_PCT, NO_MM_SAVE_PCT, 
+          NO_BANK_BORROW_PCT, NO_MFI_BORROW_PCT, NO_SACCO_BORROW_PCT, NO_GOV_BORROW_PCT, NO_MM_BORROW_PCT,  
+          ncol = 3, nrow = 5)
+```
+
+## 4.2 Drawing Statistical Map
+
+```{r}
+tmap_mode("plot")
+```
+
+```{r}
+tm_shape(dist_tz)+
+  tm_polygons() +
+tm_shape(tz_sf) + 
+  tm_fill(col="no_bank_pct") +
+tm_layout(main.title = "Percentage of unbanked in Tanzania",
+            main.title.size = 1,
+            main.title.position = c("center"),
+            main.title.fontface = "bold") 
+```
+
+From the tmap above, we can see that most of the area tends to be a darker color, which means that the majority of people there have no access to banks.
+
+```{r}
+tmap_mode("plot")
+```
+
+```{r}
+tm_shape(dist_tz)+
+  tm_polygons() +
+tm_shape(tz_sf) + 
+  tm_fill(col="no_insurance_pct") +
+tm_layout(main.title = "No insurance population in Tanzania",
+            main.title.size = 1,
+            main.title.position = c("center"),
+            main.title.fontface = "bold") 
+```
+
+```{r}
+tm_shape(dist_tz)+
+  tm_polygons() +
+tm_shape(tz_sf) + 
+  tm_fill(col="no_mm_access_pct") +
+tm_layout(main.title = "No mobile access in Tanzania",
+            main.title.size = 1,
+            main.title.position = c("center"),
+            main.title.fontface = "bold") 
+```
+
+From the map above, we can see that most of the districts in Tanzania has mobile access
+
+```{r}
+tm_shape(dist_tz)+
+  tm_polygons() +
+tm_shape(tz_sf) + 
+  tm_fill(col="no_int_access_pct") +
+tm_layout(main.title = "No internet access in Tanzania",
+            main.title.size = 1,
+            main.title.position = c("center"),
+            main.title.fontface = "bold") 
+```
+
+Even though mobile phones are very accessible, there are still a lot of areas without internet access, which can be quite concerning.
+
+```{r}
+tm_shape(dist_tz)+
+  tm_polygons() +
+tm_shape(tz_sf) + 
+  tm_fill(col="no_budget_pct") +
+tm_layout(main.title = "Awareness to do budgeting in Tanzania",
+            main.title.size = 1,
+            main.title.position = c("center"),
+            main.title.fontface = "bold") 
+```
+
+From the map, we can see that mostly people do budgeting in their daily lives, this is a good sign for their financial awareness.
+
+```{r}
+tm_shape(dist_tz)+
+  tm_polygons() +
+tm_shape(tz_sf) + 
+  tm_fill(col="no_fin_edu_pct") +
+tm_layout(main.title = "Financial Education in Tanzania",
+            main.title.size = 1,
+            main.title.position = c("center"),
+            main.title.fontface = "bold") 
+```
+
+The map above shows a quite concerning result. Most area in Tanzania have not received a proper financial education.
+
+# 5 Geographically Weighted Regression
+
+## 5.1 Simple Linear Regression
+
+### 5.1.1 Percentage of Unbanked and Cluster Type
+
+The simple linear regression model below explains the linearity between dependent variable of unbanked population and independent variable of rural areas.
+
+```{r}
+tz.slr <- lm(formula=no_bank_pct ~ rural_pct, data = tz_sf)
+```
+
+```{r}
+summary(tz.slr)
+```
+
+The output can be explained by the following formula
+
+y = 60.8901 + 0.2662x1
+
+The R-squared of 0.3477 reveals that the simple linear regression model is able to explain about 35% of the unbanked population.
+
+The p-value is much smaller than 0.0001, we reject the null hypothesis of B0 and B1 = 0. Result shows that B0 and B1 are good parameter estimates.
+
+Let us visualize on a scatterplot
+
+```{r}
+ggplot(data=tz_sf,  
+       aes(x=`rural_pct`, y=`no_bank_pct`)) +
+  geom_point() +
+  geom_smooth(method = lm)
+```
+
+The spread of data points shows that there is a moderate correlation, but it is a positive correlation between rural area population and people with no access to banks
+
+### 5.1.2 Percentage of Insurance
+
+Is the access to insurance service limited to people without financial education?
+
+```{r}
+tz.slr1 <- lm(formula=no_insurance_pct ~ no_fin_edu_pct, data = tz_sf)
+```
+
+```{r}
+summary(tz.slr1)
+```
+
+y = 62.44351 + 0.32188x1
+
+There is a positive correlation between people without insurance and level of financial education
+
+```{r}
+ggplot(data=tz_sf,  
+       aes(x=`no_fin_edu_pct`, y=`no_insurance_pct`)) +
+  geom_point() +
+  geom_smooth(method = lm)
+```
+
+The data points are quite scattered, meaning the correlation is not very strong
+
+## 5.2 Multiple Linear Regression
+
+### 5.2.1 Correlation Matrix
+
+Let us visualize the correlation using scatterplot matrix
+
+```{r}
+corr_columns <- c("rural_pct", "no_edu_pct", "no_fin_edu_pct",
+                  "no_mm_access_pct", "no_int_access_pct", "no_laptop_access_pct",
+                  "no_bank_pct", "no_insurance_pct", "no_mm_pct")
+```
+
+```{r}
+corr_columns2 <- c("rural_pct", "no_edu_pct", "no_fin_edu_pct",
+                  "no_pb_doc_pct", "no_bank_doc_pct", "no_insurance_doc_pct",
+                  "no_biz_register_pct")
+```
+
+```{r}
+corr_columns3 <- c("rural_pct", "no_edu_pct", "no_fin_edu_pct",
+                   "no_bank_advice_pct", "no_mfi_advice_pct",
+                   "no_sacco_advice_pct", "no_fin_advice_pct", "no_sg_advice_pct",
+                   "no_ml_advice_pct", "no_gov_advice_pct")
+```
+
+```{r}
+corr_columns4 <- c("rural_pct", "no_edu_pct", "no_fin_edu_pct",
+                   "no_budget_pct", "no_bank_save_pct", "no_mfi_save_pct",
+                   "no_sacco_save_pct", "no_mm_save_pct")
+```
+
+```{r}
+corr_columns5 <- c("rural_pct", "no_edu_pct", "no_fin_edu_pct",
+                   "no_budget_pct", "no_bank_borrow_pct",
+                   "no_mfi_borrow_pct", "no_sacco_borrow_pct", "no_gov_borrow_pct",
+                   "no_mm_borrow_pct")
+```
+
+```{r}
+corrplot(cor(tz_gwr[, corr_columns]), diag = FALSE, order = "AOE",
+         tl.pos = "td", tl.cex = 0.8, method = "number", type = "upper")
+```
+
+```{r}
+corrplot(cor(tz_gwr[, corr_columns2]), diag = FALSE, order = "AOE",
+         tl.pos = "td", tl.cex = 0.8, method = "number", type = "upper")
+```
+
+```{r}
+corrplot(cor(tz_gwr[, corr_columns3]), diag = FALSE, order = "AOE",
+         tl.pos = "td", tl.cex = 0.8, method = "number", type = "upper")
+```
+
+```{r}
+corrplot(cor(tz_gwr[, corr_columns4]), diag = FALSE, order = "AOE",
+         tl.pos = "td", tl.cex = 0.8, method = "number", type = "upper")
+```
+
+```{r}
+corrplot(cor(tz_gwr[, corr_columns5]), diag = FALSE, order = "AOE",
+         tl.pos = "td", tl.cex = 0.8, method = "number", type = "upper")
+```
+
+### 5.2.2 Build Multiple Linear Regression Model
+
+```{r}
+tz.mlr <- lm(formula = no_bank_pct ~ rural_pct + female_pct +
+                  no_edu_pct + no_fin_edu_pct +
+                  no_mm_access_pct + no_int_access_pct + no_laptop_access_pct + 
+                  no_insurance_pct  + no_bank_advice_pct + no_fin_advice_pct, 
+                data=tz_sf)
+summary(tz.mlr)
+```
+
+From the result above, we can see that the parameters such as **rural percentage, financial education, no internet access** are statistically significant, meaning that these 3 parameters impacted the level of accessibility towards financial services in Tanzania.
+
+### 5.2.3 Publication Quality Table: olsrr method
+
+```{r}
+tz.mlr1 <- lm(formula = no_bank_pct ~ rural_pct + female_pct +
+                  no_edu_pct + no_fin_edu_pct +
+                  no_mm_access_pct + no_int_access_pct + 
+                  no_laptop_access_pct + no_insurance_pct + 
+                  no_bank_advice_pct + no_fin_advice_pct, 
+                data=tz_sf)
+ols_regress(tz.mlr1)
+```
+
+### 5.2.4 Publication Quality Table: gtsummary method
+
+```{r}
+tbl_regression(tz.mlr1, intercept = TRUE)
+```
+
+This table provides a clearer view to assess the Beta, confidence interval and p-value.
+
+## 5.3 GW Model
+
+### 5.3.1 Fixed Bandwidth GWR Model
+
+Convert sf dataframe to sp
+
+```{r}
+tz.sp <- as_Spatial(tz_sf)
+```
+
+```{r}
+bw.fixed <- bw.gwr(formula = no_bank_pct ~ rural_pct + female_pct +
+                  no_edu_pct + no_fin_edu_pct +
+                  no_mm_access_pct + no_int_access_pct + 
+                  no_laptop_access_pct + no_insurance_pct + 
+                  no_bank_advice_pct + no_fin_advice_pct,  
+                   data=tz.sp, 
+                   approach="CV", 
+                   kernel="gaussian", 
+                   adaptive=FALSE, 
+                   longlat=FALSE)
+```
+
+```{r}
+gwr.fixed <- gwr.basic(formula = no_bank_pct ~ rural_pct + female_pct +
+                  no_edu_pct + no_fin_edu_pct +
+                  no_mm_access_pct + no_int_access_pct + 
+                  no_laptop_access_pct + no_insurance_pct + 
+                  no_bank_advice_pct + no_fin_advice_pct,
+                  data=tz.sp,
+                  bw=bw.fixed,
+                  kernel = 'gaussian',
+                  longlat = FALSE)
+```
+
+```{r}
+gwr.fixed
+```
+
+### 5.3.2 Adaptive Bandwidth GWR Model
+
+```{r}
+bw.adaptive <- bw.gwr(formula = no_bank_pct ~ rural_pct + female_pct +
+                  no_edu_pct + no_fin_edu_pct +
+                  no_mm_access_pct + no_int_access_pct + 
+                  no_laptop_access_pct + no_insurance_pct + 
+                  no_bank_advice_pct + no_fin_advice_pct,  
+                   data=tz.sp, 
+                   approach="CV", 
+                   kernel="gaussian", 
+                   adaptive=TRUE, 
+                   longlat=FALSE)
+```
+
+Result shows that 38 is the recommended data points to be used
+
+```{r}
+gwr.adaptive <- gwr.basic(formula = no_bank_pct ~ rural_pct + female_pct +
+                  no_edu_pct + no_fin_edu_pct +
+                  no_mm_access_pct + no_int_access_pct + 
+                  no_laptop_access_pct + no_insurance_pct + 
+                  no_bank_advice_pct + no_fin_advice_pct,
+                  data=tz.sp,
+                  bw=bw.adaptive,
+                  kernel = 'gaussian',
+                  adaptive = TRUE,
+                  longlat = FALSE)
+```
+
+```{r}
+gwr.adaptive
+```
+
+### 5.4 Converting SDF to sf dataframe
+
+```{r}
+tz_adaptive <- st_as_sf(gwr.adaptive$SDF) %>% 
+  st_transform(crs=4210)
+```
+
+```{r}
+gwr.adaptive.output <- as.data.frame(gwr.adaptive$SDF)
+tz_sf.adaptive <- cbind(tz_adaptive, as.matrix(gwr.adaptive.output))
+```
+
+## 5.5 Visualising Local R2
+
+```{r}
+tmap_mode("view")
+tm_shape(dist_tz)+
+  tm_polygons(alpha = 0.1) +
+tm_shape(tz_sf.adaptive) +  
+  tm_dots(col = "Local_R2",
+          border.col = "gray60",
+          border.lwd = 1
+          )
+```
+
+```{r}
+tmap_mode("plot")
+```
+
+# 6 Conclusion and Recommendations
+
+## 6.1 Conclusion
+
+1.  **Internet Accessibility:** Majority of people in Tanzania have access to mobile phones, while the internet accessibility shows the opposite result. This means that internet are not well developed in Tanzania, making it difficult for the residents to gain self-awareness on financial situations.
+2.  **Financial Education:** Majority of the regions in Tanzania have never received financial education in their lives. This is one of the concerning factors affecting lack of financial awareness in Tanzania.
+3.  **Accessibility to Financial Institutions:** Majority of people in Tanzania do not ask any financial institutions for financial advice, this shows that there is lack of ability to access or lack of awareness to financial situations.
+
+## 6.2 Recommendations
+
+1.  **Improve Internet Services in Tanzania:** By improving the internet services, people in Tanzania can utilize their mobile phone and other devices better and gain more updated information regarding financial situations happening in the current time.
+2.  **Provide Financial Education:** Tanzania government is highly encouraged to provide a financial education, whether for students still in school, or working adults. By improving the financial awareness, it can also help them utilize more financial institutions.
+3.  **Provide Financial Services in rural area:** From the analysis, we can see that being in a rural area does impact the level of financial situations or awareness, hence, by providing more services accessible to people in rural area, it will also help elevate the financial awareness and reduce the gap between rural and urban people.
